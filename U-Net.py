@@ -1,15 +1,3 @@
-"""
-Wie sieht das Modell aus:
-- in allen Convolutional Layern wird padding benutzt
-- filter Kernels in the first convolutional Layern
-- Best case: d = 4 channels = 16
-- 
-- Für 10 Epochen trainiert
-- Adam optimizer
-- biases initialized to 0
-- ReLU 
-"""
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -35,6 +23,7 @@ class DistanceTransformUNet(nn.Module):
         # Final convolution layer
         self.final_conv = nn.Conv2d(c, out_channels, kernel_size=1)
 
+    # Convolutional Block
     def conv_block(self, in_channels, out_channels, activation):
         layers = []
         layers.append(nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1))
