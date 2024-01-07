@@ -120,23 +120,108 @@ for filename in os.listdir(folder_path):
         np.save(saved_array_path, combined_dist_transform)
 '''
 
-# Testisdatensatz
-pathT = "D:/Datasets/testis_nuclei_segmentations/coloured_masks_single_cell_nuclei/"
+# Testis ########################################################
 
-old_filename = "11657-28091999_01_x1=559_y1=3839_x2=1583_y2=4863.png"
+##### masks_single_cell_nuclei dataset #####
+folder_path = "D:/Datasets/testis_nuclei_segmentations/masks_single_cell_nuclei"
+folder_output = "D:/Datasets/testis_nuclei_segmentations/CellDistanceTransform/"
 
-image_path = os.path.join(pathT, old_filename)
+for filename in os.listdir(folder_path):
+    if filename.endswith(".png"):
+        image_path = os.path.join(folder_path, filename)
 
-# Bild für Verarbeitung bereit machen
-image = Image.open(pathT)
-image_array = np.array(image)
-unique_values = np.unique(image_array)
-print(unique_values)
+        # Bild für Verarbeitung bereit machen
+        image = Image.open(image_path)
+        image_array = np.array(image)
+        unique_values = np.unique(image_array)
+        combined_dist_transform = np.zeros_like(image_array, dtype=float) # leeres np Array für Distanztransformation erstellen
+
+        # Distanztransformationen
+        # Distanztransformation für jeden einzigartigen Pixelwert berechnen
+        for value in unique_values[1:]:  # Ab 1 beginnen
+            # Binäres Bild, in dem nur aktuelle Pixelwertgruppe Wert 1 hat, Rest Wert 0
+            binary_mask = (image_array == value).astype(np.uint8)
+            
+            # Distanztransformation berechnen
+            dist_transform = distance_transform_edt(binary_mask)
+            
+            # Distanzwerte normalisieren falls größer als 255
+            normalized_dist_transform = (dist_transform * 255) / dist_transform.max()
+            #!!! (dist_transform - dist_transform.min()) / (dist_transform.max() - dist_transform.min()) * 255
+            
+            # berechnete Distanztransformation von value in np Array hinzufügen
+            combined_dist_transform += dist_transform
+
+        only_filename = filename[:-4]
+
+        saved_image_path = os.path.join(folder_output, f"{only_filename}_DT.png")
+        saved_array_path = os.path.join(folder_output, f"{only_filename}_DT.npy")
+        # In Bild umwandeln und Array und Bild abspeichern
+        combined_dist_transform_image = Image.fromarray(combined_dist_transform.astype(np.uint8))
+        combined_dist_transform_image.save(saved_image_path)
+        np.save(saved_array_path, combined_dist_transform)
+
+
+
 '''
-new_filename = "0001_masks.png"
-
 old_path = os.path.join(pathT, old_filename)
-new_path = os.path.join(pathT, new_filename)
 
-os.rename(old_path, new_path)
+image = Image.open(old_path)
+image_array = np.array(image)
+unique_values = np.unique(image)
+
+# Distanztransformation anwenden
+dist_transform = distance_transform_edt(image_array)
+
+normalized_dist_transform = (dist_transform * 255) / dist_transform.max()
+
+# Die Distanztransformation in ein Bild umwandeln
+dist_transform_image = Image.fromarray(normalized_dist_transform.astype(np.uint8))
+
+unique_values_dt = np.unique(dist_transform_image)
+print(unique_values_dt)
+
+# Das Bild der Distanztransformation anzeigen (optional)
+dist_transform_image.show()
 '''
+
+# masks_tubulus
+folder_path = "D:/Datasets/testis_nuclei_segmentations/masks_tubulus"
+folder_output = "D:/Datasets/testis_nuclei_segmentations/TubulusDistanceTransform/"
+
+for filename in os.listdir(folder_path):
+    if filename.endswith(".png"):
+        image_path = os.path.join(folder_path, filename)
+
+        # Bild für Verarbeitung bereit machen
+        image = Image.open(image_path)
+        image_array = np.array(image)
+        unique_values = np.unique(image_array)
+        combined_dist_transform = np.zeros_like(image_array, dtype=float) # leeres np Array für Distanztransformation erstellen
+
+        # Distanztransformationen
+        # Distanztransformation für jeden einzigartigen Pixelwert berechnen
+        for value in unique_values[1:]:  # Ab 1 beginnen
+            # Binäres Bild, in dem nur aktuelle Pixelwertgruppe Wert 1 hat, Rest Wert 0
+            binary_mask = (image_array == value).astype(np.uint8)
+            
+            # Distanztransformation berechnen
+            dist_transform = distance_transform_edt(binary_mask)
+            
+            # Distanzwerte normalisieren falls größer als 255
+            normalized_dist_transform = (dist_transform * 255) / dist_transform.max()
+            #!!! (dist_transform - dist_transform.min()) / (dist_transform.max() - dist_transform.min()) * 255
+            
+            # berechnete Distanztransformation von value in np Array hinzufügen
+            combined_dist_transform += dist_transform
+        
+
+        only_filename = filename[:-4]
+
+        saved_image_path = os.path.join(folder_output, f"{only_filename}_DT.png")
+        saved_array_path = os.path.join(folder_output, f"{only_filename}_DT.npy")
+        # In Bild umwandeln und Array und Bild abspeichern
+        combined_dist_transform_image = Image.fromarray(combined_dist_transform.astype(np.uint8))
+        combined_dist_transform_image.save(saved_image_path)
+        np.save(saved_array_path, combined_dist_transform)
+
