@@ -4,9 +4,7 @@ from PIL import Image
 from scipy.ndimage import distance_transform_edt, gaussian_filter
 import os
 
-##### Signed Distance Transform #####
-
-
+##### Helper functions #####
 #######################
 # scale_to_255(): scales array from 0 to 255 and gives image for visual control
 def scale_to_255(array_to_scale):
@@ -20,9 +18,9 @@ def scale_to_255(array_to_scale):
     # show image of array
     scaled_image = Image.fromarray((scaled_array).astype(np.uint8))
     scaled_image.show()
-     
 
 
+##### Signed Distance Transform #####
 #######################
 # sign(): gets distance transform of the masks and distance transform of the background
 #         and brings them together as one. The distance transform of the masks is
@@ -115,9 +113,3 @@ signed_distance_transform("D:/Datasets/Cellpose/test/masks/", "D:/Datasets/Cellp
 signed_distance_transform("D:/Datasets/Cellpose/train/masks/", "D:/Datasets/Cellpose/train/distance_transform/", "D:/Datasets/Cellpose/train/weights/")
 signed_distance_transform("D:/Datasets/testis_nuclei_segmentations/masks_tubulus/", "D:/Datasets/testis_nuclei_segmentations/distance_transform_tubulus/", "D:/Datasets/testis_nuclei_segmentations/weights_tubulus/")
 signed_distance_transform("D:/Datasets/testis_nuclei_segmentations/coloured_masks_single_cell_nuclei/", "D:/Datasets/testis_nuclei_segmentations/distance_transform_cell/", "D:/Datasets/testis_nuclei_segmentations/weights_cell/")
-'''
-file = "D:/Datasets/Cellpose/test/distance_transform/0000_dt.npy"
-loaded = scale_to_255(np.load(file))
-control = Image.fromarray(loaded.astype(np.uint8))
-control.show()
-'''
