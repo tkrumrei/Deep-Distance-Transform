@@ -4,42 +4,6 @@ from PIL import Image
 from scipy.ndimage import distance_transform_edt, gaussian_filter
 import os
 
-##### Cells Length for clipping #####
-# cells are usually round so 2x mean of the distance transform is width of the cell
-# median and max is calculated for more information
-def length_cells(folder_path):
-    len_cells = np.empty(0,) # empty array for the length of the cells
-
-
-    for filename in os.listdir(folder_path): # all files in folder
-        if filename.endswith(".png"): # only if it ends with .png
-            image_path = os.path.join(folder_path, filename) # get image path
-
-            # image to np.array
-            image = Image.open(image_path)
-            image_array = np.array(image)
-
-            # look at unique values of the distance transform
-            # length of unique values is biggest value of the distance transform in this image
-            unique_values = np.unique(image_array)  
-            len_cells = np.append(len_cells, len(unique_values)) # append to length of cells
-
-    mean_cell = np.mean(len_cells) # mean of the biggest values of the distance transform from the images in the folder
-    median_cell = np.median(len_cells) # median of the biggest values of the distance transform from the images in the folder
-    max_cell = np.max(len_cells) # biggest value of the distance transform from the images in the folder
-
-    return(mean_cell, median_cell, max_cell)
-
-'''
-# function call length_cells:
-c_test = np.array(length_cells("D:/Datasets/Cellpose/test/distance_transform/"))
-print(c_test) # [24.38235294 24.         50.        ]
-c_train = np.array(length_cells("D:/Datasets/Cellpose/train/distance_transform/"))
-print(c_train) # [24.35740741 22.         74.        ]
-t_cell = np.array(length_cells("D:/Datasets/testis_nuclei_segmentations/distance_transform"))
-print(t_cell) # [13.64582539 13.         32.        ]
-'''
-
 ##### Signed Distance Transform #####
 
 
