@@ -46,7 +46,7 @@ def datasplits(folder_path, folder_path_cellpose_test, folder_path_cellpose_trai
     set_size = ceil(files_len / 5) # round up
 
     # First part is test set
-    test_set = image_files[0:set_size] + image_files_cellpose_test
+    test_set = image_files[0:set_size]
 
     # prepare rest of the files for training sets array and create training_sets_mix array
     training_set = image_files[set_size:]
@@ -68,25 +68,29 @@ def datasplits(folder_path, folder_path_cellpose_test, folder_path_cellpose_trai
     # on one sheet. Also create five other sheets for every fold of testis training sets
     excel_file_path = os.path.join(folder_path, 'testis_split.xlsx')
     with pd.ExcelWriter(excel_file_path, engine='openpyxl') as writer:
-        # test set in own sheet
-        df_test = pd.DataFrame(test_set, columns=['Test Image Files'])
-        df_test.to_excel(writer, sheet_name='Test Set', index=False)
         # training sets
         for i, set in enumerate(training_sets):
             df_train = pd.DataFrame(set, columns=['Training Image Files'])
             df_train.to_excel(writer, sheet_name=f'Fold {i + 1}', index=False)
+        # test sets
+        df_test = pd.DataFrame(image_files_cellpose_test, columns=['Test Image Files'])
+        df_test.to_excel(writer, sheet_name='Cellpose Test Set', index=False)
+        df_test = pd.DataFrame(test_set, columns=['Test Image Files'])
+        df_test.to_excel(writer, sheet_name='Testis Test Set', index=False)
 
     # Cellpose:
     # create excel file and add names of images from the cellpose and testis test sets
     # on one sheet. Create also another sheet for training with the cellpose train dataset 
     excel_file_path = os.path.join(folder_path, 'cellpose_split.xlsx')
     with pd.ExcelWriter(excel_file_path, engine='openpyxl') as writer:
-        # test set in own sheet
-        df_test = pd.DataFrame(test_set, columns=['Test Image Files'])
-        df_test.to_excel(writer, sheet_name='Test Set', index=False)
         # training set
         df_test = pd.DataFrame(image_files_cellpose_train, columns=['Training Image Files'])
         df_test.to_excel(writer, sheet_name='Training Set', index=False)
+        # test sets
+        df_test = pd.DataFrame(image_files_cellpose_test, columns=['Test Image Files'])
+        df_test.to_excel(writer, sheet_name='Cellpose Test Set', index=False)
+        df_test = pd.DataFrame(test_set, columns=['Test Image Files'])
+        df_test.to_excel(writer, sheet_name='Testis Test Set', index=False)
             
     # Mix:
     # create excel file and add names of images from the cellpose and testis test sets
@@ -94,12 +98,14 @@ def datasplits(folder_path, folder_path_cellpose_test, folder_path_cellpose_trai
     # combined with the Cellpose training set
     excel_file_path = os.path.join(folder_path, 'mix_split.xlsx')
     with pd.ExcelWriter(excel_file_path, engine='openpyxl') as writer:
-        # test set in own sheet
-        df_test = pd.DataFrame(test_set, columns=['Test Image Files'])
-        df_test.to_excel(writer, sheet_name='Test Set', index=False)
         # training sets
         for i, set in enumerate(training_sets_mix):
             df_train = pd.DataFrame(set, columns=['Training Image Files'])
             df_train.to_excel(writer, sheet_name=f'Fold {i + 1}', index=False)
+        # test sets
+        df_test = pd.DataFrame(image_files_cellpose_test, columns=['Test Image Files'])
+        df_test.to_excel(writer, sheet_name='Cellpose Test Set', index=False)
+        df_test = pd.DataFrame(test_set, columns=['Test Image Files'])
+        df_test.to_excel(writer, sheet_name='Testis Test Set', index=False)
 
 datasplits(folder_path_testis, folder_path_cellpose_test, folder_path_cellpose_train)
