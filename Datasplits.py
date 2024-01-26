@@ -25,6 +25,7 @@ import random
 folder_path_testis = "D:/Datasets/testis_nuclei_segmentations/img"
 folder_path_cellpose_test = "D:/Datasets/Cellpose/test/img"
 folder_path_cellpose_train = "D:/Datasets/Cellpose/train/img"
+output_folder = "D:/Datasets"
 
 #######################
 # get_masks(): get back mask array of image files
@@ -45,7 +46,7 @@ def get_masks(image_files):
 #                     in five parts as training sets and also get written in the excel file
 #                     Two other excel files will be created. One for the Cellpose dataset and
 #                     another one fot the mix of the two datasets.
-def datasplits(folder_path, folder_path_cellpose_test, folder_path_cellpose_train):
+def datasplits(folder_path, folder_path_cellpose_test, folder_path_cellpose_train, output_folder):
     # get Cellpose datasets
     image_files_cellpose_test = [f for f in os.listdir(folder_path_cellpose_test) if f.endswith('.png')]
     image_files_cellpose_train = [f for f in os.listdir(folder_path_cellpose_train) if f.endswith('.png')]
@@ -79,7 +80,7 @@ def datasplits(folder_path, folder_path_cellpose_test, folder_path_cellpose_trai
     # Testis:
     # create excel file and add names of images from the cellpose and testis test sets
     # on one sheet. Also create five other sheets for every fold of testis training sets
-    excel_file_path = os.path.join(folder_path, 'testis_split.xlsx')
+    excel_file_path = os.path.join(output_folder, 'testis_split.xlsx')
     with pd.ExcelWriter(excel_file_path, engine='openpyxl') as writer:
         # training sets
         for i, set in enumerate(training_sets):
@@ -100,7 +101,7 @@ def datasplits(folder_path, folder_path_cellpose_test, folder_path_cellpose_trai
     # Cellpose:
     # create excel file and add names of images from the cellpose and testis test sets
     # on one sheet. Create also another sheet for training with the cellpose train dataset 
-    excel_file_path = os.path.join(folder_path, 'cellpose_split.xlsx')
+    excel_file_path = os.path.join(output_folder, 'cellpose_split.xlsx')
     with pd.ExcelWriter(excel_file_path, engine='openpyxl') as writer:
         # training set
         df_train = pd.DataFrame({
@@ -121,7 +122,7 @@ def datasplits(folder_path, folder_path_cellpose_test, folder_path_cellpose_trai
     # create excel file and add names of images from the cellpose and testis test sets
     # on one sheet. Also create five other sheets for every fold of testis training sets 
     # combined with the Cellpose training set
-    excel_file_path = os.path.join(folder_path, 'mix_split.xlsx')
+    excel_file_path = os.path.join(output_folder, 'mix_split.xlsx')
     with pd.ExcelWriter(excel_file_path, engine='openpyxl') as writer:
         # training sets
         for i, set in enumerate(training_sets_mix):
@@ -139,4 +140,4 @@ def datasplits(folder_path, folder_path_cellpose_test, folder_path_cellpose_trai
             'Test Mask Files': get_masks(test_set)})
         df_test.to_excel(writer, sheet_name='Testis Test Set', index=False)
 
-datasplits(folder_path_testis, folder_path_cellpose_test, folder_path_cellpose_train)
+datasplits(folder_path_testis, folder_path_cellpose_test, folder_path_cellpose_train, output_folder)
