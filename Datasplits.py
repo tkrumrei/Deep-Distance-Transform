@@ -22,9 +22,22 @@ import pandas as pd
 from math import ceil
 import random
 
-folder_path_testis = "D:/Datasets/testis_nuclei_segmentations/original"
+folder_path_testis = "D:/Datasets/testis_nuclei_segmentations/img"
 folder_path_cellpose_test = "D:/Datasets/Cellpose/test/img"
 folder_path_cellpose_train = "D:/Datasets/Cellpose/train/img"
+
+#######################
+# get_masks(): get back mask array of image files
+def get_masks(image_files):
+    # mask_path = f"{image_path[:-4]}masks"
+    masks_set = []
+    for image in image_files:
+      if len(image) < 20:
+        mask_file = f"{image[:-7]}masks.png"
+      else:
+          mask_file = image
+      masks_set.append(mask_file)
+    return masks_set
 
 #######################
 # datasplits(): split files into 5 parts first one is the test set end get written into 
@@ -70,12 +83,18 @@ def datasplits(folder_path, folder_path_cellpose_test, folder_path_cellpose_trai
     with pd.ExcelWriter(excel_file_path, engine='openpyxl') as writer:
         # training sets
         for i, set in enumerate(training_sets):
-            df_train = pd.DataFrame(set, columns=['Training Image Files'])
+            df_train = pd.DataFrame({
+                'Training Image Files': set,
+                'Training Mask Files': get_masks(set)})
             df_train.to_excel(writer, sheet_name=f'Fold {i + 1}', index=False)
         # test sets
-        df_test = pd.DataFrame(image_files_cellpose_test, columns=['Test Image Files'])
+        df_test = pd.DataFrame({
+            'Test Image Files': image_files_cellpose_test,
+            'Test Mask Files': get_masks(image_files_cellpose_test)})
         df_test.to_excel(writer, sheet_name='Cellpose Test Set', index=False)
-        df_test = pd.DataFrame(test_set, columns=['Test Image Files'])
+        df_test = pd.DataFrame({
+            'Test Image Files': test_set,
+            'Test Mask Files': get_masks(test_set)})
         df_test.to_excel(writer, sheet_name='Testis Test Set', index=False)
 
     # Cellpose:
@@ -84,12 +103,18 @@ def datasplits(folder_path, folder_path_cellpose_test, folder_path_cellpose_trai
     excel_file_path = os.path.join(folder_path, 'cellpose_split.xlsx')
     with pd.ExcelWriter(excel_file_path, engine='openpyxl') as writer:
         # training set
-        df_test = pd.DataFrame(image_files_cellpose_train, columns=['Training Image Files'])
-        df_test.to_excel(writer, sheet_name='Training Set', index=False)
+        df_train = pd.DataFrame({
+            'Training Image Files': image_files_cellpose_train,
+            'Training Mask Files': get_masks(image_files_cellpose_train)})
+        df_train.to_excel(writer, sheet_name='Training Set', index=False)
         # test sets
-        df_test = pd.DataFrame(image_files_cellpose_test, columns=['Test Image Files'])
+        df_test = pd.DataFrame({
+            'Test Image Files': image_files_cellpose_test,
+            'Test Mask Files': get_masks(image_files_cellpose_test)})
         df_test.to_excel(writer, sheet_name='Cellpose Test Set', index=False)
-        df_test = pd.DataFrame(test_set, columns=['Test Image Files'])
+        df_test = pd.DataFrame({
+            'Test Image Files': test_set,
+            'Test Mask Files': get_masks(test_set)})
         df_test.to_excel(writer, sheet_name='Testis Test Set', index=False)
             
     # Mix:
@@ -100,12 +125,18 @@ def datasplits(folder_path, folder_path_cellpose_test, folder_path_cellpose_trai
     with pd.ExcelWriter(excel_file_path, engine='openpyxl') as writer:
         # training sets
         for i, set in enumerate(training_sets_mix):
-            df_train = pd.DataFrame(set, columns=['Training Image Files'])
+            df_train = pd.DataFrame({
+                'Training Image Files': set,
+                'Training Mask Files': get_masks(set)})
             df_train.to_excel(writer, sheet_name=f'Fold {i + 1}', index=False)
         # test sets
-        df_test = pd.DataFrame(image_files_cellpose_test, columns=['Test Image Files'])
+        df_test = pd.DataFrame({
+            'Test Image Files': image_files_cellpose_test,
+            'Test Mask Files': get_masks(image_files_cellpose_test)})
         df_test.to_excel(writer, sheet_name='Cellpose Test Set', index=False)
-        df_test = pd.DataFrame(test_set, columns=['Test Image Files'])
+        df_test = pd.DataFrame({
+            'Test Image Files': test_set,
+            'Test Mask Files': get_masks(test_set)})
         df_test.to_excel(writer, sheet_name='Testis Test Set', index=False)
 
 datasplits(folder_path_testis, folder_path_cellpose_test, folder_path_cellpose_train)
