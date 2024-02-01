@@ -21,11 +21,12 @@ import os
 import pandas as pd
 from math import ceil
 import random
+import shutil
 
 folder_path_testis = "D:/Datasets/testis_nuclei_segmentations/img"
 folder_path_cellpose_test = "D:/Datasets/Cellpose/test/img"
 folder_path_cellpose_train = "D:/Datasets/Cellpose/train/img"
-output_folder = "D:/Datasets"
+output_folder_csv = "D:/Datasets"
 
 #######################
 # get_masks(): get back mask array of image files
@@ -112,6 +113,52 @@ def datasplits(folder_path, folder_path_cellpose_test, folder_path_cellpose_trai
     # Mix
     for i, set in enumerate(training_sets_mix):
         get_all_to_csv(set, f"Mix_fold_{i + 1}", output_folder)
-        
 
-datasplits(folder_path_testis, folder_path_cellpose_test, folder_path_cellpose_train, output_folder)
+    # return
+    return test_set, training_sets    
+
+
+#######################
+# split_Testis_data(): splits images and masks of testis from the test and folds in different folders
+def split_Testis_data():
+    testis_test, testis_train = datasplits(folder_path_testis, folder_path_cellpose_test, folder_path_cellpose_train, output_folder_csv)
+
+    input_folder = "D:/Datasets/Cellpose_Model/Testis/img"
+    output_folder = "D:/Datasets/Cellpose_Model/Testis"
+    input_folder_masks = "D:/Datasets/Cellpose_Model/Testis/masks"
+
+    test_masks = get_masks(testis_test)
+
+    # Testis Test Set image
+    for image in testis_test:
+        old_image_path = os.path.join(input_folder, image)
+        new_output_folder = f"{output_folder}/test"
+        new_image_path = os.path.join(new_output_folder, image)
+
+        shutil.move(old_image_path, new_image_path)
+    # Testis Test Set mask    
+    for image in test_masks:
+        old_image_path = os.path.join(input_folder_masks, image)
+        new_output_folder = f"{output_folder}/test_masks"
+        new_image_path = os.path.join(new_output_folder, image)
+
+        shutil.move(old_image_path, new_image_path)
+
+    # Testis Folds
+    for i, set in enumerate(testis_train):
+        for image in set:
+            old_image_path = os.path.join(input_folder, image)
+            new_output_folder = f"{output_folder}/Fold_{i + 1}"
+            new_image_path = os.path.join(new_output_folder, image)
+
+            shutil.move(old_image_path, new_image_path)
+        # Testis Test Set mask
+        train_masks = get_masks(set)    
+        for image in train_masks:
+            old_image_path = os.path.join(input_folder_masks, image)
+            new_output_folder = f"{output_folder}/Fold_{i + 1}_masks"
+            new_image_path = os.path.join(new_output_folder, image)
+
+            shutil.move(old_image_path, new_image_path)
+
+split_Testis_data()
