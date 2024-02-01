@@ -99,4 +99,6 @@ def rename_for_Cellpose(abbrevation, folder_path):
 '''
 rename_for_Cellpose("_img", "D:/Datasets/testis_nuclei_segmentations/img") # img
 rename_for_Cellpose("_masks", "D:/Datasets/testis_nuclei_segmentations/masks") # masks
+rename_for_Cellpose("_dt", "D:/Datasets/testis_nuclei_segmentations/distance_transform") # dt
+rename_for_Cellpose("_w", "D:/Datasets/testis_nuclei_segmentations/weights") # w
 '''
