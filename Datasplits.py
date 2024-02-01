@@ -53,7 +53,7 @@ def get_distance_transform(image_files):
 def get_weights(image_files):
     weights_set = []
     for image in image_files:
-       weights_file = f"{image[:-7]}weights.npy"
+       weights_file = f"{image[:-7]}w.npy"
        weights_set.append(weights_file)
     return weights_set
 
@@ -126,8 +126,12 @@ def split_Testis_data():
     input_folder = "D:/Datasets/Cellpose_Model/Testis/img"
     output_folder = "D:/Datasets/Cellpose_Model/Testis"
     input_folder_masks = "D:/Datasets/Cellpose_Model/Testis/masks"
+    input_folder_dt = "D:/Datasets/Cellpose_Model/Testis/distance_transform"
+    input_folder_weights = "D:/Datasets/Cellpose_Model/Testis/weights"
 
     test_masks = get_masks(testis_test)
+    test_dt = get_distance_transform(testis_test)
+    test_weights = get_weights(testis_test)
 
     # Testis Test Set image
     for image in testis_test:
@@ -136,10 +140,27 @@ def split_Testis_data():
         new_image_path = os.path.join(new_output_folder, image)
 
         shutil.move(old_image_path, new_image_path)
+
     # Testis Test Set mask    
     for image in test_masks:
         old_image_path = os.path.join(input_folder_masks, image)
         new_output_folder = f"{output_folder}/test_masks"
+        new_image_path = os.path.join(new_output_folder, image)
+
+        shutil.move(old_image_path, new_image_path)
+
+    # Testis Test Set distance transform    
+    for image in test_dt:
+        old_image_path = os.path.join(input_folder_dt, image)
+        new_output_folder = f"{output_folder}/test_dt"
+        new_image_path = os.path.join(new_output_folder, image)
+
+        shutil.move(old_image_path, new_image_path)
+
+    # Testis Test Set weights   
+    for image in test_weights:
+        old_image_path = os.path.join(input_folder_weights, image)
+        new_output_folder = f"{output_folder}/test_weights"
         new_image_path = os.path.join(new_output_folder, image)
 
         shutil.move(old_image_path, new_image_path)
@@ -152,11 +173,30 @@ def split_Testis_data():
             new_image_path = os.path.join(new_output_folder, image)
 
             shutil.move(old_image_path, new_image_path)
-        # Testis Test Set mask
+        
+        # Testis train set masks
         train_masks = get_masks(set)    
         for image in train_masks:
             old_image_path = os.path.join(input_folder_masks, image)
             new_output_folder = f"{output_folder}/Fold_{i + 1}_masks"
+            new_image_path = os.path.join(new_output_folder, image)
+
+            shutil.move(old_image_path, new_image_path)
+
+        # Testis Train Set distance transformation
+        train_dt = get_distance_transform(set)    
+        for image in train_dt:
+            old_image_path = os.path.join(input_folder_dt, image)
+            new_output_folder = f"{output_folder}/Fold_{i + 1}_dt"
+            new_image_path = os.path.join(new_output_folder, image)
+
+            shutil.move(old_image_path, new_image_path)
+
+        # Testis Train Set weights
+        train_weights = get_weights(set)    
+        for image in train_weights:
+            old_image_path = os.path.join(input_folder_weights, image)
+            new_output_folder = f"{output_folder}/Fold_{i + 1}_weights"
             new_image_path = os.path.join(new_output_folder, image)
 
             shutil.move(old_image_path, new_image_path)
