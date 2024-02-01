@@ -30,22 +30,47 @@ output_folder = "D:/Datasets"
 #######################
 # get_masks(): get back mask array of image files
 def get_masks(image_files):
-    # mask_path = f"{image_path[:-4]}masks"
     masks_set = []
     for image in image_files:
-      if len(image) < 20:
-        mask_file = f"{image[:-7]}masks.png"
-      else:
-          mask_file = image
-      masks_set.append(mask_file)
+       mask_file = f"{image[:-7]}masks.png"
+       masks_set.append(mask_file)
     return masks_set
 
+
 #######################
-# datasplits(): split files into 5 parts first one is the test set end get written into 
-#                     excel file on one sheet. Remaining 4 are put together  and split again
-#                     in five parts as training sets and also get written in the excel file
-#                     Two other excel files will be created. One for the Cellpose dataset and
-#                     another one fot the mix of the two datasets.
+# get_distance_transform(): get back distance transform array of image files
+def get_distance_transform(image_files):
+    dt_set = []
+    for image in image_files:
+       dt_file = f"{image[:-7]}dt.npy"
+       dt_set.append(dt_file)
+    return dt_set
+
+
+#######################
+# get_weights(): get back weights array of image files
+def get_weights(image_files):
+    weights_set = []
+    for image in image_files:
+       weights_file = f"{image[:-7]}weights.npy"
+       weights_set.append(weights_file)
+    return weights_set
+
+#######################
+# get_all_to_csv(): gets an array of image files and adds them and the masks, dt and weights
+#                   to .csv files
+def get_all_to_csv(array, name, output_folder):
+    df = pd.DataFrame(array)
+    df.to_csv(f"{output_folder}/{name}_img.csv")
+    df = pd.DataFrame(get_masks(array))
+    df.to_csv(f"{output_folder}/{name}_masks.csv")
+    df = pd.DataFrame(get_distance_transform(array))
+    df.to_csv(f"{output_folder}/{name}_dt.csv")
+    df = pd.DataFrame(get_weights(array))
+    df.to_csv(f"{output_folder}/{name}_weights.csv")
+
+#######################
+# datasplits(): makes the datasplit for the 5-fold cross-validation
 def datasplits(folder_path, folder_path_cellpose_test, folder_path_cellpose_train, output_folder):
     # get Cellpose datasets
     image_files_cellpose_test = [f for f in os.listdir(folder_path_cellpose_test) if f.endswith('.png')]
@@ -76,68 +101,17 @@ def datasplits(folder_path, folder_path_cellpose_test, folder_path_cellpose_trai
         # combine every set with cellpose train dataset
         training_sets_mix.append(set_slice + image_files_cellpose_train)
 
-    ##### Excel files #####
-    # Testis:
-    # create excel file and add names of images from the cellpose and testis test sets
-    # on one sheet. Also create five other sheets for every fold of testis training sets
-    excel_file_path = os.path.join(output_folder, 'testis_split.xlsx')
-    with pd.ExcelWriter(excel_file_path, engine='openpyxl') as writer:
-        # training sets
-        for i, set in enumerate(training_sets):
-            df_train = pd.DataFrame({
-                'Training Image Files': set,
-                'Training Mask Files': get_masks(set)})
-            df_train.to_excel(writer, sheet_name=f'Fold {i + 1}', index=False)
-        # test sets
-        df_test = pd.DataFrame({
-            'Test Image Files': image_files_cellpose_test,
-            'Test Mask Files': get_masks(image_files_cellpose_test)})
-        df_test.to_excel(writer, sheet_name='Cellpose Test Set', index=False)
-        df_test = pd.DataFrame({
-            'Test Image Files': test_set,
-            'Test Mask Files': get_masks(test_set)})
-        df_test.to_excel(writer, sheet_name='Testis Test Set', index=False)
-
-    # Cellpose:
-    # create excel file and add names of images from the cellpose and testis test sets
-    # on one sheet. Create also another sheet for training with the cellpose train dataset 
-    excel_file_path = os.path.join(output_folder, 'cellpose_split.xlsx')
-    with pd.ExcelWriter(excel_file_path, engine='openpyxl') as writer:
-        # training set
-        df_train = pd.DataFrame({
-            'Training Image Files': image_files_cellpose_train,
-            'Training Mask Files': get_masks(image_files_cellpose_train)})
-        df_train.to_excel(writer, sheet_name='Training Set', index=False)
-        # test sets
-        df_test = pd.DataFrame({
-            'Test Image Files': image_files_cellpose_test,
-            'Test Mask Files': get_masks(image_files_cellpose_test)})
-        df_test.to_excel(writer, sheet_name='Cellpose Test Set', index=False)
-        df_test = pd.DataFrame({
-            'Test Image Files': test_set,
-            'Test Mask Files': get_masks(test_set)})
-        df_test.to_excel(writer, sheet_name='Testis Test Set', index=False)
-            
-    # Mix:
-    # create excel file and add names of images from the cellpose and testis test sets
-    # on one sheet. Also create five other sheets for every fold of testis training sets 
-    # combined with the Cellpose training set
-    excel_file_path = os.path.join(output_folder, 'mix_split.xlsx')
-    with pd.ExcelWriter(excel_file_path, engine='openpyxl') as writer:
-        # training sets
-        for i, set in enumerate(training_sets_mix):
-            df_train = pd.DataFrame({
-                'Training Image Files': set,
-                'Training Mask Files': get_masks(set)})
-            df_train.to_excel(writer, sheet_name=f'Fold {i + 1}', index=False)
-        # test sets
-        df_test = pd.DataFrame({
-            'Test Image Files': image_files_cellpose_test,
-            'Test Mask Files': get_masks(image_files_cellpose_test)})
-        df_test.to_excel(writer, sheet_name='Cellpose Test Set', index=False)
-        df_test = pd.DataFrame({
-            'Test Image Files': test_set,
-            'Test Mask Files': get_masks(test_set)})
-        df_test.to_excel(writer, sheet_name='Testis Test Set', index=False)
+    ##### CSV files #####
+    # Cellpose
+    get_all_to_csv(image_files_cellpose_train, "Cellpose_train", output_folder)
+    get_all_to_csv(image_files_cellpose_test, "Cellpose_test", output_folder)
+    # Testis
+    for i, set in enumerate(training_sets):
+            get_all_to_csv(set, f"Testis_fold_{i + 1}", output_folder)
+    get_all_to_csv(test_set, "Testis_test", output_folder)
+    # Mix
+    for i, set in enumerate(training_sets_mix):
+        get_all_to_csv(set, f"Mix_fold_{i + 1}", output_folder)
+        
 
 datasplits(folder_path_testis, folder_path_cellpose_test, folder_path_cellpose_train, output_folder)
