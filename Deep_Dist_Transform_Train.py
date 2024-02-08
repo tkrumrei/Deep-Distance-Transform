@@ -44,13 +44,13 @@ class ImageDataset(Dataset):
         weight = np.load(weight_path)
 
         if self.transform is not None:
-                image = self.transform(image)  # Anwenden der Transformation auf das Bild
+                image = self.transform(image)  # transform of image
 
-        dist_transform = Image.fromarray(np.uint8(dist_transform*255))  # Skalieren, falls nötig
-        weight = Image.fromarray(np.uint8(weight*255))  # Skalieren, falls nötig
+        dist_transform = Image.fromarray(np.uint8(dist_transform*255))  # skaling
+        weight = Image.fromarray(np.uint8(weight*255))  # skaling
         
-        dist_transform = self.transform(dist_transform)  # Jetzt anwendbar
-        weight = self.transform(weight)  # Jetzt anwendbar
+        dist_transform = self.transform(dist_transform) 
+        weight = self.transform(weight)
 
         return image, dist_transform, weight
 
@@ -64,7 +64,7 @@ class WeightedEuclideanLoss(nn.Module):
 
 transform = T.Compose([
     T.Resize((64, 64)),
-    T.ToTensor(),  # Wandelt das PIL-Image in ein Tensor um und skaliert die Werte auf [0, 1]
+    T.ToTensor(), # changes T to Tensor
 ])
 
 # save dataset in dataset
@@ -72,7 +72,7 @@ dataset = ImageDataset(
     image_folder=train_image_folder,
     dt_folder=train_dt_folder,
     weights_folder= train_weights_folder,
-    transform=transform  # Fügen Sie hier die korrekte Transformation hinzu, falls erforderlich
+    transform=transform
 )
 
 # Data Loader with mini-batch size 25
