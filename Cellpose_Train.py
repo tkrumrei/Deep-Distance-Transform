@@ -16,7 +16,7 @@ def run_cellpose_training(train_path, test_path, model):
 
     subprocess.run(full_command, shell=True, check=True)
 
-run_cellpose_training("D:/Datasets/Cellpose_Model/Cellpose/Train/", "D:/Datasets/Cellpose_Model/Cellpose/Test_Cellpose/", "None")
+# run_cellpose_training("D:/Datasets/Cellpose_Model/Cellpose/Train/", "D:/Datasets/Cellpose_Model/Cellpose/Test_Cellpose/", "None")
 
 
 def cellpose_train(train_path, test_path, model_type, chan, chan2, model_name):
@@ -27,23 +27,23 @@ def cellpose_train(train_path, test_path, model_type, chan, chan2, model_name):
 
     channels = [chan, chan2]
 
-    output = io.load_train_test_data(train_path, test_path)
+    output = io.load_train_test_data(train_path, test_path, image_filter = "_img")
     train_data, train_labels, _, test_data, test_labels, _ = output
 
     new_model_path = model.train(train_data, train_labels,
                                  test_data = test_data,
                                  test_labels = test_labels,
                                  channels=channels, 
-                                 save_path=train_path, 
+                                 save_path=train_path,
+                                 save_every=1,
                                  n_epochs=100,
                                  learning_rate=0.1, 
-                                 weight_decay=0.0001, 
-                                 nimg_per_epoch=8,
+                                 weight_decay=0.0001,
                                  model_name=model_name)
     
     diam_labels = model.diam_labels.copy()
 
-    output = io.load_train_test_data(test_path)
+    output = io.load_train_test_data(test_path, image_filter = "_img", mask_filter ="_masks")
     test_data, test_labels = output[:2]
 
     # run model on test images
@@ -56,7 +56,7 @@ def cellpose_train(train_path, test_path, model_type, chan, chan2, model_name):
     print('')
     print(f'>>> average precision at iou threshold 0.5 = {ap[:,0].mean():.3f}')
 
-# cellpose_train("D:/Datasets/Cellpose_Model/Cellpose/Train/", "D:/Datasets/Cellpose_Model/Cellpose/Test_Cellpose/", "None", 2, 0, "Cellpose_Model")
+cellpose_train("D:/Datasets/Cellpose_Model/Cellpose/Train/", "D:/Datasets/Cellpose_Model/Cellpose/Test_Cellpose/", "None", 2, 0, "Cellpose_Model")
 
 
 
