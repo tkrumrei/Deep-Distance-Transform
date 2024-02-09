@@ -15,13 +15,6 @@ from torchvision import transforms as T
 from UNet import UNet
 from PIL import Image
 
-# Folder
-train_image_folder = "D:/Datasets/Testis_Model/Cellpose/Train/img"
-train_dt_folder = "D:/Datasets/Testis_Model/Cellpose/Train/distance_transform"
-train_weights_folder = "D:/Datasets/Testis_Model/Cellpose/Train/weights"
-test_image_folder = "D:/Datasets/Testis_Model/Cellpose/Test_Cellpose/img"
-test_dt_folder = "D:/Datasets/Testis_Model/Cellpose/Test_Cellpose/distance_transform"
-test_weights_folder = "D:/Datasets/Testis_Model/Cellpose/Test_Cellpose/weights"
 
 class ImageDataset(Dataset):
     def __init__(self, image_folder, dt_folder, weights_folder, transform=None):
@@ -54,6 +47,8 @@ class ImageDataset(Dataset):
 
         return image, dist_transform, weight
 
+####################
+# WeightedEuclideanLoss(): returns the mean weighted Euclidean Loss for the Epoche
 class WeightedEuclideanLoss(nn.Module):
     def __init__(self):
         super(WeightedEuclideanLoss, self).__init__()
@@ -67,35 +62,53 @@ transform = T.Compose([
     T.ToTensor(), # changes T to Tensor
 ])
 
-# save dataset in dataset
-dataset = ImageDataset(
-    image_folder=train_image_folder,
-    dt_folder=train_dt_folder,
-    weights_folder= train_weights_folder,
-    transform=transform
-)
 
-# Data Loader with mini-batch size 25
-train_loader = DataLoader(dataset, batch_size=25, shuffle=True)
+def DDT_Train(train_path):
+    train_image_folder = f"{train_path}/img"
+    train_dt_folder = f"{train_path}/distance_transform"
+    train_weights_folder = f"{train_path}/weights"
 
-# model, loss function and Adam optimizer with parameters from paper
-model = UNet(in_channels=3, out_channels=1)
-loss_fn = WeightedEuclideanLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, betas=(0.9, 0.999), eps=1e-8, weight_decay=2e-4)
+    # save dataset in dataset
+    dataset = ImageDataset(
+        image_folder=train_image_folder,
+        dt_folder=train_dt_folder,
+        weights_folder= train_weights_folder,
+        transform=transform
+    )
 
-# training
-num_epochs = 10
-for epoch in range(num_epochs):
-    model.train()
-    for inputs, targets, weights in train_loader:
-        optimizer.zero_grad()
-        outputs = model(inputs)
-        loss_value = loss_fn(outputs, targets, weights)
-        loss_value.backward()
-        optimizer.step()
-    print(f"Epoch{epoch} fertig")
+    # Data Loader with mini-batch size 25
+    train_loader = DataLoader(dataset, batch_size=25, shuffle=True)
 
-# save model
-torch.save(model, f'{train_image_folder}/unet_model.pth')
+    # model, loss function and Adam optimizer with parameters from paper
+    model = UNet(in_channels=3, out_channels=1)
+    loss_fn = WeightedEuclideanLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, betas=(0.9, 0.999), eps=1e-8, weight_decay=2e-4)
 
+    # training
+    num_epochs = 10
+    smallest_loss = float('inf')
+    for epoch in range(num_epochs):
+        model.train()
+        total_loss = 0
+        total_batches = len(train_loader)
 
+        for inputs, targets, weights in train_loader:
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            loss_value = loss_fn(outputs, targets, weights)
+            loss_value.backward()
+            optimizer.step()
+
+            total_loss += loss_value.item()
+        
+        average_loss = total_loss / total_batches
+        print(f"Epoch{epoch} fertig, Durchschnittlicher Loss: {average_loss}")
+
+        if average_loss < smallest_loss:
+            smallest_loss = average_loss 
+            model_save_path = os.path.join(train_image_folder, f"unet_model_epoch_{epoch}.pth") 
+            torch.save(model.state_dict(), model_save_path)
+            print(f"Modell von Epoche {epoch} gespeichert")
+    print("Fertig!")
+
+DDT_Train("D:/Datasets/Testis_Model/Cellpose/Train")
