@@ -44,30 +44,12 @@ def display_images_and_masks(images, masks, title=""):
     plt.suptitle(title)
     plt.show()
 
-
-def cellpose_train(train_path, test_path, test_path_2, model_type, model_name):
-    logger = io.logger_setup()
+def cellpose_eval(model_path, test_path, test_path_2, diam_labels):
+    full_model_path = f"{model_path}/models/Best_Model"
 
     use_GPU = core.use_gpu()
-    model = models.CellposeModel(gpu=use_GPU, model_type = model_type)
+    model = models.CellposeModel(gpu=use_GPU, pretrained_model = full_model_path)
 
-    channels = [0, None]
-
-    output = io.load_train_test_data(train_path, image_filter="_img")
-    train_data, train_labels, _, _, _, _ = output
-
-    new_model_path = model.train(train_data, train_labels,
-                                 channels=channels, 
-                                 save_path=train_path,
-                                 save_each = True,
-                                 save_every=1,
-                                 n_epochs=10,
-                                 learning_rate=0.1, 
-                                 weight_decay=0.0001,
-                                 model_name=model_name)
-    
-    diam_labels = model.diam_labels.copy()
-    
     output = io.load_train_test_data(test_path, image_filter = "_img")
     test_data, test_labels = output[:2]
 
@@ -116,6 +98,32 @@ def cellpose_train(train_path, test_path, test_path_2, model_type, model_name):
     print(f"Average Dice Score: {average_dice:.4f}")
 
     display_images_and_masks(test_data_2, masks2, title="Test Set 2 Results")
+
+
+def cellpose_train(train_path, test_path, test_path_2, model_type, model_name):
+    logger = io.logger_setup()
+
+    use_GPU = core.use_gpu()
+    model = models.CellposeModel(gpu=use_GPU, model_type = model_type)
+
+    channels = [0, None]
+
+    output = io.load_train_test_data(train_path, image_filter="_img")
+    train_data, train_labels, _, _, _, _ = output
+
+    new_model_path = model.train(train_data, train_labels,
+                                 channels=channels, 
+                                 save_path=train_path,
+                                 save_each = True,
+                                 save_every=1,
+                                 n_epochs=10,
+                                 learning_rate=0.1, 
+                                 weight_decay=0.0001,
+                                 model_name=model_name)
+    
+    diam_labels = model.diam_labels.copy()
+    
+    cellpose_eval(train_path, test_path, test_path_2, diam_labels)
     
 
 
