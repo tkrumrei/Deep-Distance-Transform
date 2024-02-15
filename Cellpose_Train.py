@@ -1,3 +1,4 @@
+# imports
 import subprocess
 import os, shutil
 import numpy as np
@@ -6,8 +7,10 @@ from cellpose import core, utils, io, models, metrics
 from glob import glob
 from sklearn.metrics import jaccard_score, f1_score
 
-
+######################
+# calculate_metrics(): calculates IoU and Dice Score for the masks
 def calculate_metrics(true_masks, pred_masks):
+    # make masks to 0 (background) and one (cells)
     true_masks = (true_masks > 0).astype(np.uint8).flatten()
     pred_masks = (pred_masks > 0).astype(np.uint8).flatten()
 
@@ -16,9 +19,9 @@ def calculate_metrics(true_masks, pred_masks):
 
     return iou, dice
 
-
+######################
+# normalize_images(): normalizes Cellpose images
 def normalize_images(images): 
-    # Konvertiert zu float, falls noch nicht geschehen
     normalized_images = []
     for image in images:
         norm_image = np.array(image, dtype=np.float32)
@@ -26,6 +29,8 @@ def normalize_images(images):
         normalized_images.append(norm_image)
     return normalized_images
 
+######################
+# display_images_and_masks(): helper function for vieweing images
 def display_images_and_masks(images, masks, title=""):
     """Anzeigefunktion für Bilder und Masken."""
     n = len(images)  # Anzahl der Bilder/Masken
@@ -44,12 +49,16 @@ def display_images_and_masks(images, masks, title=""):
     plt.suptitle(title)
     plt.show()
 
-def cellpose_eval(model_path, test_path, test_path_2, diam_labels):
-    full_model_path = f"{model_path}/models/Best_Model"
 
+######################
+# cellpose_eval(): Evaluates the Best Cellpose model on both datasets with IoU and Dice Score
+def cellpose_eval(model_path, test_path, test_path_2, diam_labels):
+    # get Best_Model
+    full_model_path = f"{model_path}/models/Best_Model"
     use_GPU = core.use_gpu()
     model = models.CellposeModel(gpu=use_GPU, pretrained_model = full_model_path)
 
+    ##### Cellpose test set #####
     output = io.load_train_test_data(test_path, image_filter = "_img")
     test_data, test_labels = output[:2]
 
@@ -68,14 +77,17 @@ def cellpose_eval(model_path, test_path, test_path_2, diam_labels):
         iou_scores.append(iou)
         dice_scores.append(dice)
 
+    # calculate average
     average_iou = sum(iou_scores) / len(iou_scores)
     average_dice = sum(dice_scores) / len(dice_scores)
 
     print(f"Average IoU: {average_iou:.4f}")
     print(f"Average Dice Score: {average_dice:.4f}")
 
-    display_images_and_masks(normalize_images(test_data), masks, title="Test Set 1 Results")
+    # only for visual control
+    # display_images_and_masks(normalize_images(test_data), masks, title="Test Set 1 Results")
     
+    ##### Testis Test set#####
     output = io.load_train_test_data(test_path_2, image_filter = "_img")
     test_data_2, test_labels_2 = output[:2]
 
@@ -91,15 +103,18 @@ def cellpose_eval(model_path, test_path, test_path_2, diam_labels):
         iou_scores_2.append(iou)
         dice_scores_2.append(dice)
 
+    # calculate average
     average_iou = sum(iou_scores_2) / len(iou_scores_2)
     average_dice = sum(dice_scores_2) / len(dice_scores_2)
 
     print(f"Average IoU: {average_iou:.4f}")
     print(f"Average Dice Score: {average_dice:.4f}")
 
-    display_images_and_masks(test_data_2, masks2, title="Test Set 2 Results")
+    # only for visual control
+    # display_images_and_masks(test_data_2, masks2, title="Test Set 2 Results")
 
-
+######################
+# cellpose_train(): trains cellpose model from scratch
 def cellpose_train(train_path, test_path, test_path_2, model_type, model_name):
     logger = io.logger_setup()
 
@@ -126,7 +141,8 @@ def cellpose_train(train_path, test_path, test_path_2, model_type, model_name):
     cellpose_eval(train_path, test_path, test_path_2, diam_labels)
     
 
-
+######################
+# Function calls
 cellpose_train("C:/Users/Tobias/Desktop/test/train/", "C:/Users/Tobias/Desktop/test/test1/", "C:/Users/Tobias/Desktop/test/test2/", None, "Cellpose_Model")
 
 
