@@ -53,10 +53,13 @@ def display_images_and_masks(images, masks, title=""):
 ######################
 # cellpose_eval(): Evaluates the Best Cellpose model on both datasets with IoU and Dice Score
 def cellpose_eval(model_path, test_path, test_path_2, diam_labels):
+    
     # get Best_Model
-    full_model_path = f"{model_path}/models/Best_Model"
+    full_model_path = f"{model_path}models/Best_Model"
     use_GPU = core.use_gpu()
     model = models.CellposeModel(gpu=use_GPU, pretrained_model = full_model_path)
+
+
 
     ##### Cellpose test set #####
     output = io.load_train_test_data(test_path, image_filter = "_img")
@@ -71,6 +74,7 @@ def cellpose_eval(model_path, test_path, test_path_2, diam_labels):
     # Angenommen, test_labels und masks sind die Listen der wahren Masken und der vorhergesagten Masken
     iou_scores = []
     dice_scores = []
+    metrics = []
 
     for true_mask, pred_mask in zip(test_labels, masks):
         iou, dice = calculate_metrics(true_mask, pred_mask)
@@ -80,6 +84,10 @@ def cellpose_eval(model_path, test_path, test_path_2, diam_labels):
     # calculate average
     average_iou = sum(iou_scores) / len(iou_scores)
     average_dice = sum(dice_scores) / len(dice_scores)
+
+    metrics = np.array([average_iou, average_dice])
+    metrics_path = f"{model_path}models/metrics_Cellpose.npy"
+    np.save(metrics_path, metrics)
 
     print(f"Average IoU: {average_iou:.4f}")
     print(f"Average Dice Score: {average_dice:.4f}")
@@ -107,6 +115,11 @@ def cellpose_eval(model_path, test_path, test_path_2, diam_labels):
     average_iou = sum(iou_scores_2) / len(iou_scores_2)
     average_dice = sum(dice_scores_2) / len(dice_scores_2)
 
+    metrics_2 = np.array([average_iou, average_dice])
+    metrics_2_path = f"{model_path}models/metrics_Testis.npy"
+    np.save(metrics_2_path, metrics_2)
+
+
     print(f"Average IoU: {average_iou:.4f}")
     print(f"Average Dice Score: {average_dice:.4f}")
 
@@ -131,7 +144,7 @@ def cellpose_train(train_path, test_path, test_path_2, model_type, model_name):
                                  save_path=train_path,
                                  save_each = True,
                                  save_every=1,
-                                 n_epochs=10,
+                                 n_epochs=100,
                                  learning_rate=0.1, 
                                  weight_decay=0.0001,
                                  model_name=model_name)
@@ -141,9 +154,22 @@ def cellpose_train(train_path, test_path, test_path_2, model_type, model_name):
     cellpose_eval(train_path, test_path, test_path_2, diam_labels)
     
 
+# cellpose_train("C:/Users/Tobias/Desktop/test/train/", "C:/Users/Tobias/Desktop/test/test1/", "C:/Users/Tobias/Desktop/test/test2/", None, "Cellpose_Model")
+
 ######################
 # Function calls
-cellpose_train("C:/Users/Tobias/Desktop/test/train/", "C:/Users/Tobias/Desktop/test/test1/", "C:/Users/Tobias/Desktop/test/test2/", None, "Cellpose_Model")
-
-
+# Cellpose Dataset
+cellpose_train("D:/Datasets/Cellpose_Model/Cellpose/Train/", "D:/Datasets/Cellpose_Model/Cellpose/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Cellpose/Test_Testis/", None, "Cellpose_Model")
+# Testis Dataset
+cellpose_train("D:/Datasets/Cellpose_Model/Testis/Fold_1/", "D:/Datasets/Cellpose_Model/Testis/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Testis/Test_Testis/", None, "Cellpose_Testis_Fold_1_Model")
+cellpose_train("D:/Datasets/Cellpose_Model/Testis/Fold_2/", "D:/Datasets/Cellpose_Model/Testis/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Testis/Test_Testis/", None, "Cellpose_Testis_Fold_2_Model")
+cellpose_train("D:/Datasets/Cellpose_Model/Testis/Fold_3/", "D:/Datasets/Cellpose_Model/Testis/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Testis/Test_Testis/", None, "Cellpose_Testis_Fold_3_Model")
+cellpose_train("D:/Datasets/Cellpose_Model/Testis/Fold_4/", "D:/Datasets/Cellpose_Model/Testis/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Testis/Test_Testis/", None, "Cellpose_Testis_Fold_4_Model")
+cellpose_train("D:/Datasets/Cellpose_Model/Testis/Fold_5/", "D:/Datasets/Cellpose_Model/Testis/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Testis/Test_Testis/", None, "Cellpose_Testis_Fold_5_Model")
+# Mix Dataset
+cellpose_train("D:/Datasets/Cellpose_Model/Mix/Fold_1/", "D:/Datasets/Cellpose_Model/Mix/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_1_Model")
+cellpose_train("D:/Datasets/Cellpose_Model/Mix/Fold_2/", "D:/Datasets/Cellpose_Model/Mix/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_2_Model")
+cellpose_train("D:/Datasets/Cellpose_Model/Mix/Fold_3/", "D:/Datasets/Cellpose_Model/Mix/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_3_Model")
+cellpose_train("D:/Datasets/Cellpose_Model/Mix/Fold_4/", "D:/Datasets/Cellpose_Model/Mix/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_4_Model")
+cellpose_train("D:/Datasets/Cellpose_Model/Mix/Fold_5/", "D:/Datasets/Cellpose_Model/Mix/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_5_Model")
 
