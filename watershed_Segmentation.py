@@ -15,16 +15,9 @@ from skimage.feature import peak_local_max
 from skimage.segmentation import watershed
 from scipy import ndimage
 
-test_dist_transforms_folder = "D:\Datasets\Testis_Model\Cellpose\Train\distance_transform"
-
-def watershed_segmentation(input_folder):
-    return
+test_dist_transforms_folder = "C:/Users/Tobias/Desktop/test2/train"
 
 
-def get_local_Min_Max(dist_transform):
-    
-
-    watershed_segmentation()
 
 def get_dist_transform(input_folder):
     dist_transforms = [f for f in os.listdir(input_folder) if f.endswith('.npy')]
@@ -34,6 +27,19 @@ def get_dist_transform(input_folder):
         dist_transform_array = np.load(dist_transform_path)
         get_local_Min_Max(dist_transform_array)
         print("Durchlauf Fertig")
+
+def get_local_Min_Max(dist_transform):
+
+def watershed_segmentation(input_folder):
+    return
+
+
+
+    
+
+    watershed_segmentation()
+
+
 
 
 get_dist_transform(test_dist_transforms_folder)
