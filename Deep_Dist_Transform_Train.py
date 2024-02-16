@@ -62,7 +62,8 @@ transform = T.Compose([
     T.ToTensor(), # changes T to Tensor
 ])
 
-
+####################
+# DDT_Train(): Train Deep Distance Transform model and save best model
 def DDT_Train(train_path):
     train_image_folder = f"{train_path}/img"
     train_dt_folder = f"{train_path}/distance_transform"
@@ -106,7 +107,7 @@ def DDT_Train(train_path):
 
         if average_loss < smallest_loss:
             smallest_loss = average_loss 
-            model_save_path = os.path.join(train_image_folder, f"unet_model_epoch_{epoch}.pth") 
+            model_save_path = os.path.join(train_image_folder, f"Best_Model.pth") 
             torch.save(model.state_dict(), model_save_path)
             print(f"Modell von Epoche {epoch} gespeichert")
     print("Fertig!")
