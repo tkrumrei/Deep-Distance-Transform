@@ -154,10 +154,15 @@ def cellpose_train(train_path, test_path, test_path_2, model_type, model_name):
     cellpose_eval(train_path, test_path, test_path_2, diam_labels)
     
 
+
 # cellpose_train("C:/Users/Tobias/Desktop/test/train/", "C:/Users/Tobias/Desktop/test/test1/", "C:/Users/Tobias/Desktop/test/test2/", None, "Cellpose_Model")
 
+'''
 ######################
 # Function calls
+##### Cellpose Nulei Model Test #####
+# ...
+##### Train on Datasets
 # Cellpose Dataset
 cellpose_train("D:/Datasets/Cellpose_Model/Cellpose/Train/", "D:/Datasets/Cellpose_Model/Cellpose/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Cellpose/Test_Testis/", None, "Cellpose_Model")
 # Testis Dataset
@@ -172,4 +177,4 @@ cellpose_train("D:/Datasets/Cellpose_Model/Mix/Fold_2/", "D:/Datasets/Cellpose_M
 cellpose_train("D:/Datasets/Cellpose_Model/Mix/Fold_3/", "D:/Datasets/Cellpose_Model/Mix/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_3_Model")
 cellpose_train("D:/Datasets/Cellpose_Model/Mix/Fold_4/", "D:/Datasets/Cellpose_Model/Mix/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_4_Model")
 cellpose_train("D:/Datasets/Cellpose_Model/Mix/Fold_5/", "D:/Datasets/Cellpose_Model/Mix/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_5_Model")
-
+'''
