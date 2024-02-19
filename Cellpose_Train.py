@@ -3,7 +3,7 @@ import subprocess
 import os, shutil
 import numpy as np
 import matplotlib.pyplot as plt
-from cellpose import core, utils, io, models, metrics
+from my_cellpose import core, utils, io, models, metrics
 from glob import glob
 from sklearn.metrics import jaccard_score, f1_score
 
