@@ -141,13 +141,13 @@ def cellpose_train(train_path, test_path, test_path_2, model_type, model_name):
     
 
 
-cellpose_train("C:/Users/Tobias/Desktop/test/train/", "C:/Users/Tobias/Desktop/test/test1/", "C:/Users/Tobias/Desktop/test/test2/", None, "Cellpose_Model")
+# cellpose_train("C:/Users/Tobias/Desktop/test/train/", "C:/Users/Tobias/Desktop/test/test1/", "C:/Users/Tobias/Desktop/test/test2/", None, "Cellpose_Model")
 
 
 ######################
 # Function calls
 ##### Cellpose Nulei Model Test #####
-cellpose_eval("", "C:/Users/Tobias/Desktop/test/test1/", "C:/Users/Tobias/Desktop/test/test2/", None)
+# cellpose_eval("", "C:/Users/Tobias/Desktop/test/test1/", "C:/Users/Tobias/Desktop/test/test2/", None)
 '''
 ##### Train on Datasets
 # Cellpose Dataset
