@@ -193,7 +193,7 @@ def mask_generation_from_seeds(dist_transform):
 
 def make_mask(dist_transform):
     list_of_masks = mask_generation_from_seeds(dist_transform)
-    mask = np.zeros_like(dist_transform)
+    mask = np.zeros_like(dist_transform, dtype=int)
     '''
     # make mask
     for i, candidate in enumerate(list_of_masks):
