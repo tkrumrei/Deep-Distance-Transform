@@ -3,9 +3,8 @@ import subprocess
 import os, shutil
 import numpy as np
 import matplotlib.pyplot as plt
-from my_cellpose import core, utils, io, models, metrics
-from glob import glob
-from sklearn.metrics import jaccard_score, f1_score
+from my_cellpose import core, io, models, metrics
+
 
 ######################
 # calculate_metrics(): calculates aggregated IoU and precision Score from cellpose for the masks
