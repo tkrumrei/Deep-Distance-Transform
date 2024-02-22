@@ -58,7 +58,7 @@ def find_local_minima(dist_transform, size=5):
     ax[1].autoscale(False)
     ax[1].plot(coordinates[:, 1], coordinates[:, 0], 'r.')
     ax[1].axis('off')
-    ax[1].set_title('Peak local max')
+    ax[1].set_title('get local minima')
 
     fig.tight_layout()
 
@@ -134,13 +134,14 @@ def segmentation(dist_transform, smax, s1, s2):
     return(mask1, mask2)
 
 def mask_generation_from_seeds(dist_transform):
-    smin = find_local_minima(dist_transform)
+    smin = find_local_minima(dist_transform, size=5)
     print(len(smin))
-    smax = find_local_maxima(dist_transform, size=10)
+    smax = find_local_maxima(dist_transform, size=20)
     print(len(smax))
 
     candidates = []
     mask_count = {}
+    counter = 0
 
     # make candidate masks and add them to candidates
     for s1 in smin:
@@ -165,8 +166,8 @@ def mask_generation_from_seeds(dist_transform):
                 else:
                     candidates.append(mask2)
                     mask_count[len(candidates) - 1] = 1
-
         print("watershed Segmentierung für s1 ist fertig")
+
 
     # sortCandidatesByCount(masks) // highest count first
     sorted_mask_count = sorted(mask_count.items(), key=lambda item: item[1], reverse=True)
@@ -193,7 +194,7 @@ def mask_generation_from_seeds(dist_transform):
 def make_mask(dist_transform):
     list_of_masks = mask_generation_from_seeds(dist_transform)
     mask = np.zeros_like(dist_transform)
-
+    '''
     # make mask
     for i, candidate in enumerate(list_of_masks):
         mask[candidate] = i + 1
@@ -215,7 +216,7 @@ def make_mask(dist_transform):
     fig.tight_layout()
 
     plt.show()
-    
+    '''
     return mask
 
 
