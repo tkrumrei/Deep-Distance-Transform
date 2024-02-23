@@ -57,14 +57,9 @@ def display_images_and_masks(images, masks, title=""):
 ######################
 # cellpose_eval(): Evaluates the Best Cellpose model on both datasets with IoU and Dice Score
 def cellpose_eval(model_path, test_path, test_path_2, diam_labels):
-    if model_path != "":
-        # get Best_Model
-        full_model_path = f"{model_path}models/Best_Model"
-        use_GPU = core.use_gpu()
-        model = models.CellposeModel(gpu=use_GPU, pretrained_model = full_model_path)
-    else:
-        use_GPU = core.use_gpu()
-        model = models.CellposeModel(gpu=use_GPU, pretrained_model = "nuclei")
+    full_model_path = f"{model_path}models/Best_Model"
+    use_GPU = core.use_gpu()
+    model = models.CellposeModel(gpu=use_GPU, pretrained_model = full_model_path)
 
 
     ##### Cellpose test set #####
@@ -76,16 +71,16 @@ def cellpose_eval(model_path, test_path, test_path_2, diam_labels):
                     channels=[0, None],
                     diameter=diam_labels)[0]
 
+
     average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(test_labels, masks)
 
-    if model_path != "":
-        metrics_path = f"{model_path}models/metrics_Cellpose.npy"
-    else:
-        metrics_path = "C:/Users/Tobias/Desktop/test/train/models/Nuclei_metrics_Cellpose.npy"
+
+    metrics_path = f"{model_path}models/metrics_Cellpose.npy"
 
     metrics = np.array([average_iou, precision, n_true_p, n_false_p, n_false_n])
     
     np.save(metrics_path, metrics)
+    print("Cellpose Test ist fertig")
 
     # only for visual control
     # display_images_and_masks(normalize_images(test_data), masks, title="Test Set 1 Results")
@@ -100,13 +95,12 @@ def cellpose_eval(model_path, test_path, test_path_2, diam_labels):
 
     average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(test_labels_2, masks_2)
 
-    if model_path != "":
-        metrics_2_path = f"{model_path}models/metrics_Testis.npy"
-    else:
-        metrics_2_path = "C:/Users/Tobias/Desktop/test/train/models/Nuclei_metrics_Testis.npy"
+
+    metrics_2_path = f"{model_path}models/metrics_Testis.npy"
 
     metrics_2 = np.array([average_iou, precision, n_true_p, n_false_p, n_false_n])
     np.save(metrics_2_path, metrics_2)
+    print("Testis Test ist fertig")
 
     # only for visual control
     # display_images_and_masks(test_data_2, masks2, title="Test Set 2 Results")
@@ -145,8 +139,6 @@ def cellpose_train(train_path, test_path, test_path_2, model_type, model_name):
 
 ######################
 # Function calls
-##### Cellpose Nulei Model Test #####
-# cellpose_eval("", "C:/Users/Tobias/Desktop/test/test1/", "C:/Users/Tobias/Desktop/test/test2/", None)
 '''
 ##### Train on Datasets
 # Cellpose Dataset
