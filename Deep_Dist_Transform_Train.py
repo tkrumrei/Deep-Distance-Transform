@@ -126,7 +126,7 @@ def DDT_predict(train_image_folder, test_path, test_path_2):
         for i, (image, _, _) in enumerate(test_loader):
             output = model(image)
             predicted_dt_np = output[0].squeeze().cpu().detach().numpy()
-            mask = Segmentation.make_mask(predicted_dt_np)
+            mask = Segmentation.make_mask(predicted_dt_np, 1051.0) # average area of Cellpose
             masks_list.append(mask)
 
     average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(true_masks_list, masks_list)
@@ -143,7 +143,7 @@ def DDT_predict(train_image_folder, test_path, test_path_2):
     test_dataset_2 = ImageDataset(
         image_folder=f"{test_path_2}/img",
         dt_folder=f"{test_path_2}/distance_transform",
-        weights_folder=f"{test_path_2}/weights",  # Für die Vorhersage nicht benötigt, kann ignoriert werden
+        weights_folder=f"{test_path_2}/weights",
         transform=test_transform
     )
 
@@ -156,7 +156,7 @@ def DDT_predict(train_image_folder, test_path, test_path_2):
         for i, (image, _, _) in enumerate(test_loader):
             output = model(image)
             predicted_dt_np = output[0].squeeze().cpu().detach().numpy()
-            mask = Segmentation.make_mask(predicted_dt_np)
+            mask = Segmentation.make_mask(predicted_dt_np, 300.0) # average area of Testis
             masks_2_list.append(mask)
             print(f"Erstellung für Bild {i}")
 
