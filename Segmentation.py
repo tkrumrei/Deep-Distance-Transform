@@ -26,27 +26,19 @@ end
 '''
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.ndimage import maximum_filter
 from skimage.feature import peak_local_max
 from skimage.segmentation import watershed
+import cv2
 
 
 
 def find_local_minima(dist_transform, size=5):
     dist_transform = -dist_transform
 
-    max_filter = maximum_filter(dist_transform, size=size)
-    print("maximum_filter berechnet")
-
-    local_maxima_mask = (dist_transform == max_filter)
-
-    threshold = 0.0
-    local_maxima_mask &= (dist_transform > threshold)
-
-    coordinates = np.argwhere(local_maxima_mask)
+    coordinates = peak_local_max(dist_transform, min_distance=size, threshold_abs=0.0)
 
     # only for visualization
-    '''
+    
     # display results
     fig, axes = plt.subplots(1, 2, figsize=(8, 3), sharex=True, sharey=True)
     ax = axes.ravel()
@@ -63,7 +55,7 @@ def find_local_minima(dist_transform, size=5):
     fig.tight_layout()
 
     plt.show()
-    '''
+    
     print("find_local_minima fertig")
     return coordinates
 
@@ -133,7 +125,20 @@ def segmentation(dist_transform, smax, s1, s2):
 
     return(mask1, mask2)
 
-def mask_generation_from_seeds(dist_transform):
+def mask_to_area(mask, cell_area):
+    area = 0.0
+    min_area = cell_area / 2.5
+    max_area = cell_area * 2.5
+
+    contours, hierarchy = cv2.findContours(mask.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    if contours:
+        area = cv2.contourArea(contours[0])
+    
+    
+    return min_area <= area <= max_area
+
+def mask_generation_from_seeds(dist_transform, cell_area):
     smin = find_local_minima(dist_transform, size=5)
     print(len(smin))
     smax = find_local_maxima(dist_transform, size=20)
@@ -149,24 +154,31 @@ def mask_generation_from_seeds(dist_transform):
             if not(np.array_equal(s2,s1)):
                 mask1, mask2 = segmentation(dist_transform, smax, s1, s2)
                 
+                # have mask1 and mask2 unusual cells widths
+                mask1_valid = mask_to_area(mask1, cell_area)
+                mask2_valid = mask_to_area(mask2, cell_area)
 
-                for i, candidate in enumerate(candidates):
-                    if np.array_equal(candidate, mask1):
-                        mask_count[i] += 1
-                        break
-                else:
-                    candidates.append(mask1)
-                    mask_count[len(candidates) - 1] = 1
+                if mask1_valid:
+                    for i, candidate in enumerate(candidates):
+                        if np.array_equal(candidate, mask1):
+                            mask_count[i] += 1
+                            break
+                    else:
+                        candidates.append(mask1)
+                        mask_count[len(candidates) - 1] = 1
 
-
-                for i, candidate in enumerate(candidates):
-                    if np.array_equal(candidate, mask2):
-                        mask_count[i] += 1
-                        break
-                else:
-                    candidates.append(mask2)
-                    mask_count[len(candidates) - 1] = 1
+                if mask2_valid:
+                    for i, candidate in enumerate(candidates):
+                        if np.array_equal(candidate, mask2):
+                            mask_count[i] += 1
+                            break
+                    else:
+                        candidates.append(mask2)
+                        mask_count[len(candidates) - 1] = 1
         print("watershed Segmentierung für s1 ist fertig")
+        counter += 1
+        if counter == 3:
+            break
 
 
     # sortCandidatesByCount(masks) // highest count first
@@ -191,17 +203,16 @@ def mask_generation_from_seeds(dist_transform):
     print("Liste von Einzelmasken ist fertig")
     return list_of_masks
 
-def make_mask(dist_transform):
-    list_of_masks = mask_generation_from_seeds(dist_transform)
+def make_mask(dist_transform, cell_area):
+    list_of_masks = mask_generation_from_seeds(dist_transform, cell_area)
     mask = np.zeros_like(dist_transform, dtype=int)
-    '''
     # make mask
     for i, candidate in enumerate(list_of_masks):
         mask[candidate] = i + 1
 
     print("Maske ist fertig")
     # only for visualization
-    
+    '''
     # display results
     fig, axes = plt.subplots(1, 2, figsize=(8, 3), sharex=True, sharey=True)
     ax = axes.ravel()
@@ -219,9 +230,8 @@ def make_mask(dist_transform):
     '''
     return mask
 
-
+'''
 dist_transform = np.load("C:/Users/Tobias/Desktop/test2/test2/distance_transform/11657-28091999_01_x1=1223_y1=3855_x2=2247_y2=4879_dt.npy")
 dist_transform2 = np.load("D:/Datasets/Testis_Model/Cellpose/Train/distance_transform/0108_dt.npy")
 dist_transform3 = np.load("D:/Datasets/Testis_Model/Cellpose/Train/distance_transform/0340_dt.npy")
-
-make_mask(dist_transform2)
+'''
