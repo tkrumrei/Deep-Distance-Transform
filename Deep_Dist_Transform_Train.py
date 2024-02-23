@@ -14,6 +14,9 @@ from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms as T
 from UNet import UNet
 from PIL import Image
+from my_cellpose import core, io, models, metrics
+import Segmentation
+import matplotlib.pyplot as plt
 
 
 class ImageDataset(Dataset):
@@ -22,7 +25,7 @@ class ImageDataset(Dataset):
         self.dt_folder = dt_folder
         self.weights_folder = weights_folder
         self.transform = transform
-        self.images = [f for f in os.listdir(image_folder) if f.endswith('.png')]
+        self.images = [f for f in os.listdir(image_folder) if f.endswith('.png')] 
     
     def __len__(self):
         return len(self.images)
@@ -62,9 +65,111 @@ transform = T.Compose([
     T.ToTensor(), # changes T to Tensor
 ])
 
+test_transform = T.Compose([
+    T.ToTensor(),  # changes T to Tensor
+])
+
+######################
+# calculate_metrics(): calculates aggregated IoU and precision Score from cellpose for the masks
+def calculate_metrics(true_masks, pred_masks):
+    iou = metrics.aggregated_jaccard_index(true_masks, pred_masks) # output array
+    average_iou = np.mean(iou)
+    precision, n_true_p, n_false_p, n_false_n = metrics.average_precision(true_masks, pred_masks)
+    average_precision = np.mean(precision)
+    average_n_true_p = np.mean(n_true_p)
+    average_n_false_p = np.mean(n_false_p)
+    average_n_false_n = np.mean(n_false_n)
+
+    print(iou)
+    print("")
+    print(f"Durchschnittliche IoU: {average_iou}")
+    print(f"Durchschnittliche Präzision {average_precision}")
+    return average_iou, average_precision, average_n_true_p, average_n_false_p, average_n_false_n
+
+######################
+# load_true_masks():
+def load_true_masks(masks_folder):
+    mask_files = [f for f in os.listdir(masks_folder) if f.endswith('.png')]
+    masks = []
+    for file_name in mask_files:
+        file_path = os.path.join(masks_folder, file_name)
+        mask = Image.open(file_path)
+        mask_array = np.array(mask)
+        masks.append(mask_array)
+    return masks
+
+######################
+# DDT_predict():
+def DDT_predict(train_image_folder, test_path, test_path_2):
+    test_mask_folder = f"{test_path}/masks"
+    test_2_mask_folder = f"{test_path_2}/masks"
+    # Modell laden
+    model = UNet(in_channels=3, out_channels=1)
+    model.load_state_dict(torch.load(f"{train_image_folder}/Best_Model.pth"))
+    model.eval()
+
+    ##### Test Cellpose #####
+    print("Cellpose Test hat begonnen")
+    test_dataset = ImageDataset(
+        image_folder=f"{test_path}/img",
+        dt_folder=f"{test_path}/distance_transform",
+        weights_folder=f"{test_path}/weights",
+        transform=test_transform
+    )
+
+    # DataLoader for Cellpose Test
+    test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
+
+    masks_list = []
+    true_masks_list = load_true_masks(test_mask_folder)
+    with torch.no_grad():
+        for i, (image, _, _) in enumerate(test_loader):
+            output = model(image)
+            predicted_dt_np = output[0].squeeze().cpu().detach().numpy()
+            mask = Segmentation.make_mask(predicted_dt_np)
+            masks_list.append(mask)
+
+    average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(true_masks_list, masks_list)
+
+
+    metrics = np.array([average_iou, precision, n_true_p, n_false_p, n_false_n])
+    
+    np.save(f"{train_image_folder}/metrics_Cellpose.npy", metrics)
+    print("Cellpose Test fertig")
+    print("-----------------------------------")
+
+    ##### Test Testis #####
+    print("Testis Test hat begonnen")
+    test_dataset_2 = ImageDataset(
+        image_folder=f"{test_path_2}/img",
+        dt_folder=f"{test_path_2}/distance_transform",
+        weights_folder=f"{test_path_2}/weights",  # Für die Vorhersage nicht benötigt, kann ignoriert werden
+        transform=test_transform
+    )
+
+    # DataLoader for Testis Test
+    test_loader = DataLoader(test_dataset_2, batch_size=1, shuffle=False)
+
+    masks_2_list = []
+    true_masks_2_list = load_true_masks(test_2_mask_folder)
+    with torch.no_grad():
+        for i, (image, _, _) in enumerate(test_loader):
+            output = model(image)
+            predicted_dt_np = output[0].squeeze().cpu().detach().numpy()
+            mask = Segmentation.make_mask(predicted_dt_np)
+            masks_2_list.append(mask)
+            print(f"Erstellung für Bild {i}")
+
+    average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(true_masks_2_list, masks_2_list)
+
+
+    metrics_2 = np.array([average_iou, precision, n_true_p, n_false_p, n_false_n])
+    
+    np.save(f"{train_image_folder}/metrics_Testis.npy", metrics_2)
+
 ####################
 # DDT_Train(): Train Deep Distance Transform model and save best model
-def DDT_Train(train_path):
+def DDT_train(train_path, test_path, test_path_2):
     train_image_folder = f"{train_path}/img"
     train_dt_folder = f"{train_path}/distance_transform"
     train_weights_folder = f"{train_path}/weights"
@@ -110,6 +215,10 @@ def DDT_Train(train_path):
             model_save_path = os.path.join(train_image_folder, f"Best_Model.pth") 
             torch.save(model.state_dict(), model_save_path)
             print(f"Modell von Epoche {epoch} gespeichert")
-    print("Fertig!")
+    print("Training ist Fertig!")
+    print("-----------------------------------")
+    print("Tests beginnen")
+    DDT_predict(train_image_folder, test_path, test_path_2)
 
-DDT_Train("D:/Datasets/Testis_Model/Cellpose/Train")
+DDT_train("C:/Users/Tobias/Desktop/test2/train", "C:/Users/Tobias/Desktop/test2/test1", "C:/Users/Tobias/Desktop/test2/test2")
+#DDT_train("D:/Datasets/Testis_Model/Cellpose/Train", "D:/Datasets/Testis_Model/Cellpose/Test_Cellpose", "D:/Datasets/Testis_Model/Cellpose/Test_Testis")
