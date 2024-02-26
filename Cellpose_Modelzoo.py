@@ -69,8 +69,10 @@ def cellpose_modelzoo_eval(test_path, test_path_2, diam_labels, model_type):
     '''
     average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(true_masks, masks)
 
-
-    metrics_path = "D:/Bachelorarbeit/Ergebnisse/Nuclei_metrics_Cellpose.npy"
+    ##### local #####
+    #metrics_path = f"D:/Bachelorarbeit/Ergebnisse/{model_type}_metrics_Cellpose.npy"
+    ##### Palma #####
+    metrics_path = f"/home/t/tkrumrei/{model_type}_metrics_Cellpose.npy"
 
     metrics = np.array([average_iou, precision, n_true_p, n_false_p, n_false_n])
     
@@ -98,7 +100,8 @@ def cellpose_modelzoo_eval(test_path, test_path_2, diam_labels, model_type):
 
     average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(true_masks_2, masks_2)
 
-    metrics_2_path = "D:/Bachelorarbeit/Ergebnisse/Nuclei_metrics_Testis.npy"
+    metrics_2_path = f"D:/Bachelorarbeit/Ergebnisse/{model_type}_metrics_Testis.npy"
+    metrics_2_path = f"/home/t/tkrumrei/{model_type}_metrics_Testis.npy"
 
     metrics_2 = np.array([average_iou, precision, n_true_p, n_false_p, n_false_n])
     np.save(metrics_2_path, metrics_2)
@@ -107,5 +110,9 @@ def cellpose_modelzoo_eval(test_path, test_path_2, diam_labels, model_type):
     # only for visual control
     # display_images_and_masks(test_data_2, masks2, title="Test Set 2 Results")
 
-cellpose_modelzoo_eval("D:/Datasets/Cellpose_Model/Cellpose/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Cellpose/Test_Testis/", None, "nuclei")
-cellpose_modelzoo_eval("D:/Datasets/Cellpose_Model/Cellpose/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Cellpose/Test_Testis/", None, "cyto")
+##### Lokal #####
+#cellpose_modelzoo_eval("D:/Datasets/Cellpose_Model/Cellpose/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Cellpose/Test_Testis/", None, "nuclei")
+#cellpose_modelzoo_eval("D:/Datasets/Cellpose_Model/Cellpose/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Cellpose/Test_Testis/", None, "cyto")
+##### Palma #####
+cellpose_modelzoo_eval("/scratch/tmp/tkrumrei/Cellpose_Model/Cellpose/Test_Cellpose/", "/scratch/tmp/tkrumrei/Cellpose_Model/Cellpose/Test_Testis/", None, "nuclei")
+cellpose_modelzoo_eval("/scratch/tmp/tkrumrei/Cellpose_Model/Cellpose/Test_Cellpose/", "/scratch/tmp/tkrumrei/Cellpose_Model/Cellpose/Test_Testis/", None, "cyto")
