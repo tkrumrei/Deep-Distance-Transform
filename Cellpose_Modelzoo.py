@@ -72,7 +72,7 @@ def cellpose_modelzoo_eval(test_path, test_path_2, diam_labels, model_type):
     ##### local #####
     #metrics_path = f"D:/Bachelorarbeit/Ergebnisse/{model_type}_metrics_Cellpose.npy"
     ##### Palma #####
-    metrics_path = f"/home/t/tkrumrei/{model_type}_metrics_Cellpose.npy"
+    metrics_path = f"/scratch/tmp/tkrumrei/Ergebnisse/{model_type}_metrics_Cellpose.npy"
 
     metrics = np.array([average_iou, precision, n_true_p, n_false_p, n_false_n])
     
@@ -101,7 +101,7 @@ def cellpose_modelzoo_eval(test_path, test_path_2, diam_labels, model_type):
     average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(true_masks_2, masks_2)
 
     metrics_2_path = f"D:/Bachelorarbeit/Ergebnisse/{model_type}_metrics_Testis.npy"
-    metrics_2_path = f"/home/t/tkrumrei/{model_type}_metrics_Testis.npy"
+    metrics_2_path = f"/scratch/tmp/tkrumrei/Ergebnisse/{model_type}_metrics_Testis.npy"
 
     metrics_2 = np.array([average_iou, precision, n_true_p, n_false_p, n_false_n])
     np.save(metrics_2_path, metrics_2)
