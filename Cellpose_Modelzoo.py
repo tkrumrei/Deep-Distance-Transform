@@ -1,6 +1,6 @@
 # imports
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from my_cellpose import core, io, models, metrics
 from PIL import Image
 import os
