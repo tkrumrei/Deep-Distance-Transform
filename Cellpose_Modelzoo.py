@@ -28,17 +28,18 @@ def cellpose_modelzoo_eval(test_path, test_path_2, diam_labels, model_type):
 
     use_GPU = core.use_gpu()
     model = models.CellposeModel(gpu=use_GPU, model_type=model_type)
-    print("Nuclei Model wird zur Evaluierung genommen")
+    print(f"{model_type}-Model wird zur Evaluierung genommen")
 
 
     ##### Cellpose test set #####
+    print("Cellpose Test wurde gestartet")
     output = io.load_train_test_data(test_path, image_filter = "_img")
     test_data, test_labels = output[:2]
 
     # run model on test images
     masks = model.eval(test_data, 
                     channels=[0, None],
-                    diameter=diam_labels)[0]
+                    diameter=None)[0]
     
  
 
@@ -67,7 +68,7 @@ def cellpose_modelzoo_eval(test_path, test_path_2, diam_labels, model_type):
 
     plt.show()
     '''
-    average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(true_masks, masks)
+    average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(test_labels, masks)
 
     ##### local #####
     #metrics_path = f"D:/Bachelorarbeit/Ergebnisse/{model_type}_metrics_Cellpose.npy"
@@ -83,6 +84,7 @@ def cellpose_modelzoo_eval(test_path, test_path_2, diam_labels, model_type):
     # display_images_and_masks(normalize_images(test_data), masks, title="Test Set 1 Results")
     
     ##### Testis Test set#####
+    print("Testis Test wurde gestartet")
     output = io.load_train_test_data(test_path_2, image_filter = "_img")
     test_data_2, test_labels_2 = output[:2]
 
@@ -96,9 +98,9 @@ def cellpose_modelzoo_eval(test_path, test_path_2, diam_labels, model_type):
         if filename.endswith('_masks.png'):
             file_path = os.path.join(test_path_2, filename)
             mask_image = Image.open(file_path)
-            true_masks.append(np.array(mask_image))
+            true_masks_2.append(np.array(mask_image))
 
-    average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(true_masks_2, masks_2)
+    average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(test_labels_2, masks_2)
 
     metrics_2_path = f"D:/Bachelorarbeit/Ergebnisse/{model_type}_metrics_Testis.npy"
     metrics_2_path = f"/scratch/tmp/tkrumrei/Ergebnisse/{model_type}_metrics_Testis.npy"
