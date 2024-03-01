@@ -24,53 +24,76 @@ def calculate_metrics(true_masks, pred_masks):
 
 ######################
 # cellpose_eval(): Evaluates the Best Cellpose model on both datasets with IoU and Dice Score
-def cellpose_eval(model_path, test_path, test_path_2, diam_labels, model_name, model_type):
+def cellpose_eval(model_path, test_path, test_path_2, diam_labels, model_name, model_type, type_of_dataset):
+
     print(f"Evaluation von {model_name} startet")
     full_model_path = f"{model_path}models/{model_name}"
     use_GPU = core.use_gpu()
     model = models.CellposeModel(gpu=use_GPU, pretrained_model = full_model_path)
 
+    if(len(test_path_2) > 1):
+        ##### Cellpose test set #####
+        output = io.load_train_test_data(test_path, image_filter = "_img")
+        test_data, test_labels = output[:2]
 
-    ##### Cellpose test set #####
-    output = io.load_train_test_data(test_path, image_filter = "_img")
-    test_data, test_labels = output[:2]
-
-    # run model on test images
-    masks = model.eval(test_data, 
-                    channels=[0, None],
-                    diameter=diam_labels)[0]
-
-
-    average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(test_labels, masks)
-
-
-    metrics_path = f"{model_path}models/{model_type}_metrics_Cellpose.npy"
-
-    metrics = np.array([average_iou, precision, n_true_p, n_false_p, n_false_n])
-    
-    np.save(metrics_path, metrics)
-    print("Cellpose Test ist fertig")
-    
-    ##### Testis Test set#####
-    output = io.load_train_test_data(test_path_2, image_filter = "_img")
-    test_data_2, test_labels_2 = output[:2]
-
-    masks_2 = model.eval(test_data_2,
+        # run model on test images
+        masks = model.eval(test_data, 
                         channels=[0, None],
                         diameter=diam_labels)[0]
 
-    average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(test_labels_2, masks_2)
+
+        average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(test_labels, masks)
 
 
-    metrics_2_path = f"{model_path}models/{model_type}metrics_Testis.npy"
+        metrics_path = f"{model_path}models/{model_type}_metrics_Cellpose.npy"
 
-    metrics_2 = np.array([average_iou, precision, n_true_p, n_false_p, n_false_n])
-    np.save(metrics_2_path, metrics_2)
-    print("Testis Test ist fertig")
+        metrics = np.array([average_iou, precision, n_true_p, n_false_p, n_false_n])
+        
+        np.save(metrics_path, metrics)
+        print("Cellpose Test ist fertig")
+    
+        ##### Testis Test set#####
+    
+        output = io.load_train_test_data(test_path_2, image_filter = "_img")
+        test_data_2, test_labels_2 = output[:2]
+
+        masks_2 = model.eval(test_data_2,
+                            channels=[0, None],
+                            diameter=diam_labels)[0]
+
+        average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(test_labels_2, masks_2)
+
+
+        metrics_2_path = f"{model_path}models/{model_type}metrics_Testis.npy"
+
+        metrics_2 = np.array([average_iou, precision, n_true_p, n_false_p, n_false_n])
+        np.save(metrics_2_path, metrics_2)
+        print("Testis Test ist fertig")
+    else:
+        ##### Fold Test #####
+        print(f"Test von {type_of_dataset} hat gestartet")
+        output = io.load_train_test_data(test_path, image_filter = "_img")
+        test_data, test_labels = output[:2]
+
+        # run model on test images
+        masks = model.eval(test_data, 
+                        channels=[0, None],
+                        diameter=diam_labels)[0]
+
+
+        average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(test_labels, masks)
+
+
+        metrics_path = f"{model_path}models/{model_type}_metrics_{type_of_dataset}.npy"
+
+        metrics = np.array([average_iou, precision, n_true_p, n_false_p, n_false_n])
+        
+        np.save(metrics_path, metrics)
+        print(f"Test von {type_of_dataset} ist fertig")
 
 ######################
 # cellpose_train(): retrains cellpose model "model_name" 
-def cellpose_train(train_path, test_path, test_path_2, model_type, model_name):
+def cellpose_train(train_path, test_path, test_path_2, model_type, model_name, type_of_dataset="normal"):
     print(f"Cellpose Model {model_type} Train startet für {model_name}.")
     logger = io.logger_setup()
 
@@ -94,7 +117,7 @@ def cellpose_train(train_path, test_path, test_path_2, model_type, model_name):
     
     diam_labels = model.diam_labels.copy()
     
-    cellpose_eval(train_path, test_path, test_path_2, diam_labels, model_name, model_type)
+    cellpose_eval(train_path, test_path, test_path_2, diam_labels, model_name, model_type, type_of_dataset)
 
 ######################
 # Function calls
@@ -104,11 +127,13 @@ palma_path = "/scratch/tmp/tkrumrei/Cellpose_Model"
 # Cellpose Dataset
 # cellpose_train("D:/Datasets/Cellpose_Model/Cellpose/Train/", "D:/Datasets/Cellpose_Model/Cellpose/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Cellpose/Test_Testis/", None, "Cellpose_Model")
 # Testis Dataset
-cellpose_train(f"{palma_path}/Testis/Fold_1/", f"{palma_path}/Testis/Test_Cellpose/", f"{palma_path}/Testis/Test_Testis/", "cyto", "Cyto_Testis_Fold_1_Model")
-cellpose_train(f"{palma_path}/Testis/Fold_2/", f"{palma_path}/Testis/Test_Cellpose/", f"{palma_path}/Testis/Test_Testis/", "cyto", "Cyto_Testis_Fold_2_Model")
-cellpose_train(f"{palma_path}/Testis/Fold_3/", f"{palma_path}/Testis/Test_Cellpose/", f"{palma_path}/Testis/Test_Testis/", "cyto", "Cyto_Testis_Fold_3_Model")
-cellpose_train(f"{palma_path}/Testis/Fold_4/", f"{palma_path}/Testis/Test_Cellpose/", f"{palma_path}/Testis/Test_Testis/", "cyto", "Cyto_Testis_Fold_4_Model")
-cellpose_train(f"{palma_path}/Testis/Fold_5/", f"{palma_path}/Testis/Test_Cellpose/", f"{palma_path}/Testis/Test_Testis/", "cyto", "Cyto_Testis_Fold_5_Model")
+cellpose_train(f"{palma_path}/Testis/Fold_1/Train/", f"{palma_path}/Testis/Fold_1/Validate/", "", "cyto", "Cyto_Testis_Fold_1_Model", "Fold_1")
+#cellpose_train(f"{palma_path}/Testis/Fold_2/Train/", f"{palma_path}/Testis/Fold_1/Validate/", "", "cyto", "Cyto_Testis_Fold_2_Model", "Fold_2")
+#cellpose_train(f"{palma_path}/Testis/Fold_3/Train/", f"{palma_path}/Testis/Fold_1/Validate/", "", "cyto", "Cyto_Testis_Fold_3_Model", "Fold_3")
+#cellpose_train(f"{palma_path}/Testis/Fold_4/Train/", f"{palma_path}/Testis/Fold_1/Validate/", "", "cyto", "Cyto_Testis_Fold_4_Model", "Fold_4")
+#cellpose_train(f"{palma_path}/Testis/Fold_5/Train/", f"{palma_path}/Testis/Fold_1/Validate/", "", "cyto", "Cyto_Testis_Fold_5_Model", "Fold_5")
+# Best Model
+#cellpose_train(f"{palma_path}/Testis/Fold_X/", f"{palma_path}/Test_Cellpose/", f"{palma_path}/Test_Testis/", "cyto", "Cyto_Testis_Fold_X_Model")
 # Mix Dataset
 #cellpose_train("D:/Datasets/Cellpose_Model/Mix/Fold_1/", "D:/Datasets/Cellpose_Model/Mix/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_1_Model")
 #cellpose_train("D:/Datasets/Cellpose_Model/Mix/Fold_2/", "D:/Datasets/Cellpose_Model/Mix/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_2_Model")
