@@ -100,7 +100,8 @@ def load_true_masks(masks_folder):
 
 ######################
 # DDT_predict():
-def DDT_predict(train_image_folder, test_path, test_path_2):
+def DDT_predict(train_image_folder, test_path, test_path_2, fold_n):
+
     test_mask_folder = f"{test_path}/masks"
     test_2_mask_folder = f"{test_path_2}/masks"
     # Modell laden
@@ -108,70 +109,101 @@ def DDT_predict(train_image_folder, test_path, test_path_2):
     model.load_state_dict(torch.load(f"{train_image_folder}/Best_Model.pth"))
     model.eval()
 
-    ##### Test Cellpose #####
-    print("Cellpose Test hat begonnen")
-    test_dataset = ImageDataset(
-        image_folder=f"{test_path}/img",
-        dt_folder=f"{test_path}/distance_transform",
-        weights_folder=f"{test_path}/weights",
-        transform=test_transform
-    )
+    if len(test_path_2 > 1):
+        ##### Test Cellpose #####
+        print("Cellpose Test hat begonnen")
+        test_dataset = ImageDataset(
+            image_folder=f"{test_path}/img",
+            dt_folder=f"{test_path}/dt",
+            weights_folder=f"{test_path}/weights",
+            transform=test_transform
+        )
 
-    # DataLoader for Cellpose Test
-    test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
+        # DataLoader for Cellpose Test
+        test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
-    masks_list = []
-    true_masks_list = load_true_masks(test_mask_folder)
-    with torch.no_grad():
-        for i, (image, _, _) in enumerate(test_loader):
-            output = model(image)
-            predicted_dt_np = output[0].squeeze().cpu().detach().numpy()
-            mask = Segmentation.make_mask(predicted_dt_np, 1051.0) # average area of Cellpose
-            masks_list.append(mask)
+        masks_list = []
+        true_masks_list = load_true_masks(test_mask_folder)
+        with torch.no_grad():
+            for i, (image, _, _) in enumerate(test_loader):
+                output = model(image)
+                predicted_dt_np = output[0].squeeze().cpu().detach().numpy()
+                mask = Segmentation.make_mask(predicted_dt_np, 1051.0) # average area of Cellpose
+                masks_list.append(mask)
 
-    average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(true_masks_list, masks_list)
-
-
-    metrics = np.array([average_iou, precision, n_true_p, n_false_p, n_false_n])
-    
-    np.save(f"{train_image_folder}/metrics_Cellpose.npy", metrics)
-    print("Cellpose Test fertig")
-    print("-----------------------------------")
-
-    ##### Test Testis #####
-    print("Testis Test hat begonnen")
-    test_dataset_2 = ImageDataset(
-        image_folder=f"{test_path_2}/img",
-        dt_folder=f"{test_path_2}/distance_transform",
-        weights_folder=f"{test_path_2}/weights",
-        transform=test_transform
-    )
-
-    # DataLoader for Testis Test
-    test_loader = DataLoader(test_dataset_2, batch_size=1, shuffle=False)
-
-    masks_2_list = []
-    true_masks_2_list = load_true_masks(test_2_mask_folder)
-    with torch.no_grad():
-        for i, (image, _, _) in enumerate(test_loader):
-            output = model(image)
-            predicted_dt_np = output[0].squeeze().cpu().detach().numpy()
-            mask = Segmentation.make_mask(predicted_dt_np, 300.0) # average area of Testis
-            masks_2_list.append(mask)
-            print(f"Erstellung für Bild {i}")
-
-    average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(true_masks_2_list, masks_2_list)
+        average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(true_masks_list, masks_list)
 
 
-    metrics_2 = np.array([average_iou, precision, n_true_p, n_false_p, n_false_n])
-    
-    np.save(f"{train_image_folder}/metrics_Testis.npy", metrics_2)
+        metrics = np.array([average_iou, precision, n_true_p, n_false_p, n_false_n])
+        
+        np.save(f"{train_image_folder}/metrics_Cellpose.npy", metrics)
+        print("Cellpose Test fertig")
+        print("-----------------------------------")
+
+        ##### Test Testis #####
+        print("Testis Test hat begonnen")
+        test_dataset_2 = ImageDataset(
+            image_folder=f"{test_path_2}/img",
+            dt_folder=f"{test_path_2}/distance_transform",
+            weights_folder=f"{test_path_2}/weights",
+            transform=test_transform
+        )
+
+        # DataLoader for Testis Test
+        test_loader = DataLoader(test_dataset_2, batch_size=1, shuffle=False)
+
+        masks_2_list = []
+        true_masks_2_list = load_true_masks(test_2_mask_folder)
+        with torch.no_grad():
+            for i, (image, _, _) in enumerate(test_loader):
+                output = model(image)
+                predicted_dt_np = output[0].squeeze().cpu().detach().numpy()
+                mask = Segmentation.make_mask(predicted_dt_np, 300.0) # average area of Testis
+                masks_2_list.append(mask)
+                print(f"Erstellung für Bild {i}")
+
+        average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(true_masks_2_list, masks_2_list)
+
+
+        metrics_2 = np.array([average_iou, precision, n_true_p, n_false_p, n_false_n])
+        
+        np.save(f"{train_image_folder}/metrics_Testis.npy", metrics_2)
+    else:
+        ##### Test Fold #####
+        print(f"Fold {fold_n} Test hat begonnen")
+        test_dataset = ImageDataset(
+            image_folder=f"{test_path}/img",
+            dt_folder=f"{test_path}/dt",
+            weights_folder=f"{test_path}/weights",
+            transform=test_transform
+        )
+
+        # DataLoader for Cellpose Test
+        test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
+
+        masks_list = []
+        true_masks_list = load_true_masks(test_mask_folder)
+        with torch.no_grad():
+            for i, (image, _, _) in enumerate(test_loader):
+                output = model(image)
+                predicted_dt_np = output[0].squeeze().cpu().detach().numpy()
+                mask = Segmentation.make_mask(predicted_dt_np, 1051.0) # average area of Cellpose
+                masks_list.append(mask)
+
+        average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(true_masks_list, masks_list)
+
+
+        metrics = np.array([average_iou, precision, n_true_p, n_false_p, n_false_n])
+        
+        np.save(f"{train_image_folder}/metrics_Fold_{fold_n}.npy", metrics)
+        print(f"Fold {fold_n} Test fertig")
+        print("-----------------------------------")
 
 ####################
 # DDT_Train(): Train Deep Distance Transform model and save best model
-def DDT_train(train_path, test_path, test_path_2):
+def DDT_train(train_path, test_path, test_path_2, fold_n):
     train_image_folder = f"{train_path}/img"
-    train_dt_folder = f"{train_path}/distance_transform"
+    train_dt_folder = f"{train_path}/dt"
     train_weights_folder = f"{train_path}/weights"
 
     # save dataset in dataset
@@ -218,7 +250,11 @@ def DDT_train(train_path, test_path, test_path_2):
     print("Training ist Fertig!")
     print("-----------------------------------")
     print("Tests beginnen")
-    DDT_predict(train_image_folder, test_path, test_path_2)
+    DDT_predict(train_image_folder, test_path, test_path_2, fold_n)
 
-DDT_train("C:/Users/Tobias/Desktop/test2/train", "C:/Users/Tobias/Desktop/test2/test1", "C:/Users/Tobias/Desktop/test2/test2")
+
+##### Function Calls #####
+# Palma Path
+palma_path = "/scratch/tmp/tkrumrei/Testis_Model"
+DDT_train(f"{palma_path}/Cellpose/Train", f"{palma_path}/Test_Cellpose", f"{palma_path}/Test_Testis", "")
 #DDT_train("D:/Datasets/Testis_Model/Cellpose/Train", "D:/Datasets/Testis_Model/Cellpose/Test_Cellpose", "D:/Datasets/Testis_Model/Cellpose/Test_Testis")
