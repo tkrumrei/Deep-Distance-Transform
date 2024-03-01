@@ -6,7 +6,7 @@
 #SBATCH --partition=normal          # on which partition to submit the job
 #SBATCH --time=24:00:00             # the max wallclock time (time limit your job will run)
  
-#SBATCH --job-name=Cellpose_Modelzoo         # the name of your job
+#SBATCH --job-name=Cellpose_Scratch         # the name of your job
 #SBATCH --mail-type=ALL             # receive an email when your job starts, finishes normally or is aborted
 #SBATCH --mail-user=tkrumrei@uni-muenster.de # your mail address
  
