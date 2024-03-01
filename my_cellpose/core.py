@@ -949,7 +949,7 @@ class UnetModel():
                         else:
                             file_name = model_name
                     '''
-                    file_name = os.path.join(file_path, file_name)
+                    file_name = os.path.join(file_path, model_name)
                     ksave += 1
                     core_logger.info(f'saving network parameters to {file_name}')
                     self.net.save_model(file_name)
