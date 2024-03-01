@@ -38,7 +38,7 @@ def find_local_minima(dist_transform, size=5):
     coordinates = peak_local_max(dist_transform, min_distance=size, threshold_abs=0.0)
 
     # only for visualization
-    
+    '''
     # display results
     fig, axes = plt.subplots(1, 2, figsize=(8, 3), sharex=True, sharey=True)
     ax = axes.ravel()
@@ -55,7 +55,7 @@ def find_local_minima(dist_transform, size=5):
     fig.tight_layout()
 
     plt.show()
-    
+    '''
     print("find_local_minima fertig")
     return coordinates
 
