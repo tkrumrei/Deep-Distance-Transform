@@ -139,7 +139,8 @@ palma_path = "/scratch/tmp/tkrumrei/Cellpose_Model"
 
 ##### Train on Datasets
 # Cellpose Dataset
-cellpose_train(f"{palma_path}/Cellpose/Train/", f"{palma_path}/Cellpose/Test_Cellpose/", f"{palma_path}/Cellpose/Test_Testis/", None, "Cellpose_Model")
+cellpose_train(f"{palma_path}/Cellpose/Train/", f"{palma_path}/Test_Cellpose/", f"{palma_path}/Test_Testis/", None, "Cellpose_Model_Scratch")
+'''
 # Testis Dataset
 cellpose_train(f"{palma_path}/Testis/Fold_1/", f"{palma_path}/Testis/Test_Cellpose/", f"{palma_path}/Testis/Test_Testis/", None, "Cellpose_Testis_Fold_1_Model")
 cellpose_train(f"{palma_path}/Testis/Fold_2/", f"{palma_path}/Testis/Test_Cellpose/", f"{palma_path}/Testis/Test_Testis/", None, "Cellpose_Testis_Fold_2_Model")
@@ -152,3 +153,4 @@ cellpose_train(f"{palma_path}/Mix/Fold_2/", f"{palma_path}/Mix/Test_Cellpose/", 
 cellpose_train(f"{palma_path}/Mix/Fold_3/", f"{palma_path}/Mix/Test_Cellpose/", f"{palma_path}/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_3_Model")
 cellpose_train(f"{palma_path}/Mix/Fold_4/", f"{palma_path}/Mix/Test_Cellpose/", f"{palma_path}/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_4_Model")
 cellpose_train(f"{palma_path}/Mix/Fold_5/", f"{palma_path}/Mix/Test_Cellpose/", f"{palma_path}/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_5_Model")
+'''
