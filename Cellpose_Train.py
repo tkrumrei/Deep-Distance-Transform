@@ -131,28 +131,24 @@ def cellpose_train(train_path, test_path, test_path_2, model_type, model_name):
     diam_labels = model.diam_labels.copy()
     
     cellpose_eval(train_path, test_path, test_path_2, diam_labels)
-    
-
-
-# cellpose_train("C:/Users/Tobias/Desktop/test/train/", "C:/Users/Tobias/Desktop/test/test1/", "C:/Users/Tobias/Desktop/test/test2/", None, "Cellpose_Model")
 
 
 ######################
 # Function calls
-'''
+palma_path = "/scratch/tmp/tkrumrei/Cellpose_Model"
+
 ##### Train on Datasets
 # Cellpose Dataset
-cellpose_train("D:/Datasets/Cellpose_Model/Cellpose/Train/", "D:/Datasets/Cellpose_Model/Cellpose/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Cellpose/Test_Testis/", None, "Cellpose_Model")
+cellpose_train(f"{palma_path}/Cellpose/Train/", f"{palma_path}/Cellpose/Test_Cellpose/", f"{palma_path}/Cellpose/Test_Testis/", None, "Cellpose_Model")
 # Testis Dataset
-cellpose_train("D:/Datasets/Cellpose_Model/Testis/Fold_1/", "D:/Datasets/Cellpose_Model/Testis/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Testis/Test_Testis/", None, "Cellpose_Testis_Fold_1_Model")
-cellpose_train("D:/Datasets/Cellpose_Model/Testis/Fold_2/", "D:/Datasets/Cellpose_Model/Testis/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Testis/Test_Testis/", None, "Cellpose_Testis_Fold_2_Model")
-cellpose_train("D:/Datasets/Cellpose_Model/Testis/Fold_3/", "D:/Datasets/Cellpose_Model/Testis/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Testis/Test_Testis/", None, "Cellpose_Testis_Fold_3_Model")
-cellpose_train("D:/Datasets/Cellpose_Model/Testis/Fold_4/", "D:/Datasets/Cellpose_Model/Testis/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Testis/Test_Testis/", None, "Cellpose_Testis_Fold_4_Model")
-cellpose_train("D:/Datasets/Cellpose_Model/Testis/Fold_5/", "D:/Datasets/Cellpose_Model/Testis/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Testis/Test_Testis/", None, "Cellpose_Testis_Fold_5_Model")
+cellpose_train(f"{palma_path}/Testis/Fold_1/", f"{palma_path}/Testis/Test_Cellpose/", f"{palma_path}/Testis/Test_Testis/", None, "Cellpose_Testis_Fold_1_Model")
+cellpose_train(f"{palma_path}/Testis/Fold_2/", f"{palma_path}/Testis/Test_Cellpose/", f"{palma_path}/Testis/Test_Testis/", None, "Cellpose_Testis_Fold_2_Model")
+cellpose_train(f"{palma_path}/Testis/Fold_3/", f"{palma_path}/Testis/Test_Cellpose/", f"{palma_path}/Testis/Test_Testis/", None, "Cellpose_Testis_Fold_3_Model")
+cellpose_train(f"{palma_path}/Testis/Fold_4/", f"{palma_path}/Testis/Test_Cellpose/", f"{palma_path}/Testis/Test_Testis/", None, "Cellpose_Testis_Fold_4_Model")
+cellpose_train(f"{palma_path}/Testis/Fold_5/", f"{palma_path}/Testis/Test_Cellpose/", f"{palma_path}/Testis/Test_Testis/", None, "Cellpose_Testis_Fold_5_Model")
 # Mix Dataset
-cellpose_train("D:/Datasets/Cellpose_Model/Mix/Fold_1/", "D:/Datasets/Cellpose_Model/Mix/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_1_Model")
-cellpose_train("D:/Datasets/Cellpose_Model/Mix/Fold_2/", "D:/Datasets/Cellpose_Model/Mix/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_2_Model")
-cellpose_train("D:/Datasets/Cellpose_Model/Mix/Fold_3/", "D:/Datasets/Cellpose_Model/Mix/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_3_Model")
-cellpose_train("D:/Datasets/Cellpose_Model/Mix/Fold_4/", "D:/Datasets/Cellpose_Model/Mix/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_4_Model")
-cellpose_train("D:/Datasets/Cellpose_Model/Mix/Fold_5/", "D:/Datasets/Cellpose_Model/Mix/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_5_Model")
-'''
+cellpose_train(f"{palma_path}/Mix/Fold_1/", f"{palma_path}/Mix/Test_Cellpose/", f"{palma_path}/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_1_Model")
+cellpose_train(f"{palma_path}/Mix/Fold_2/", f"{palma_path}/Mix/Test_Cellpose/", f"{palma_path}/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_2_Model")
+cellpose_train(f"{palma_path}/Mix/Fold_3/", f"{palma_path}/Mix/Test_Cellpose/", f"{palma_path}/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_3_Model")
+cellpose_train(f"{palma_path}/Mix/Fold_4/", f"{palma_path}/Mix/Test_Cellpose/", f"{palma_path}/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_4_Model")
+cellpose_train(f"{palma_path}/Mix/Fold_5/", f"{palma_path}/Mix/Test_Cellpose/", f"{palma_path}/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_5_Model")
