@@ -116,5 +116,5 @@ def cellpose_modelzoo_eval(test_path, test_path_2, diam_labels, model_type):
 #cellpose_modelzoo_eval("D:/Datasets/Cellpose_Model/Cellpose/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Cellpose/Test_Testis/", None, "nuclei")
 #cellpose_modelzoo_eval("D:/Datasets/Cellpose_Model/Cellpose/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Cellpose/Test_Testis/", None, "cyto")
 ##### Palma #####
-cellpose_modelzoo_eval("/scratch/tmp/tkrumrei/Cellpose_Model/Cellpose/Test_Cellpose/", "/scratch/tmp/tkrumrei/Cellpose_Model/Cellpose/Test_Testis/", None, "nuclei")
-cellpose_modelzoo_eval("/scratch/tmp/tkrumrei/Cellpose_Model/Cellpose/Test_Cellpose/", "/scratch/tmp/tkrumrei/Cellpose_Model/Cellpose/Test_Testis/", None, "cyto")
+cellpose_modelzoo_eval("/scratch/tmp/tkrumrei/Cellpose_Model/Test_Cellpose/", "/scratch/tmp/tkrumrei/Cellpose_Model/Test_Testis/", None, "nuclei")
+cellpose_modelzoo_eval("/scratch/tmp/tkrumrei/Cellpose_Model/Test_Cellpose/", "/scratch/tmp/tkrumrei/Cellpose_Model/Test_Testis/", None, "cyto")
