@@ -109,7 +109,7 @@ def DDT_predict(train_image_folder, test_path, test_path_2, fold_n):
     model.load_state_dict(torch.load(f"{train_image_folder}/Best_Model.pth"))
     model.eval()
 
-    if len(test_path_2 > 1):
+    if len(test_path_2) > 1:
         ##### Test Cellpose #####
         print("Cellpose Test hat begonnen")
         test_dataset = ImageDataset(
