@@ -6,11 +6,11 @@ U-Net Deep Distance Transform Paper:
 - 16 oder 32 channel
 - activation function: ReLU
 '''
-
+# Source of inspiration: https://www.youtube.com/watch?v=IHq1t7NxS8k
 # imports
 import torch 
 import torch.nn as nn
-import torchvision.transforms.functional as TF
+import torch.nn.functional as F
 
 class DoubleConv(nn.Module):
     def __init__(self, in_channels, out_channels):
@@ -54,6 +54,7 @@ class UNet(nn.Module):
         self.final_conv = nn.Conv2d(features[0], out_channels, kernel_size=1)
 
     def forward(self, x):
+        input_size = x.shape[2:]
         skip_connections = []
 
         for down in self.downs:
@@ -68,11 +69,12 @@ class UNet(nn.Module):
             x = self.ups[index](x)
             skip_connection = skip_connections[index//2]
             
-            # when image not divisible by 16
             if x.shape != skip_connection.shape:
-                x = TF.resize(x, size=skip_connection.shape[2:])
+                x = F.interpolate(x, size=skip_connection.shape[2:], mode='bilinear', align_corners=False)
             
             concat_skip = torch.cat((skip_connection, x), dim=1)
             x = self.ups[index+1](concat_skip)
 
-        return self.final_conv(x)
+        x = self.final_conv(x)
+        x = F.interpolate(x, size=input_size, mode='bilinear', align_corners=False)
+        return x

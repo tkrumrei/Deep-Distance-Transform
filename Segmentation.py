@@ -176,10 +176,12 @@ def mask_generation_from_seeds(dist_transform, cell_area):
                         candidates.append(mask2)
                         mask_count[len(candidates) - 1] = 1
         print("watershed Segmentierung für s1 ist fertig")
-        counter += 1
-        if counter == 3:
+        '''
+        # for faster result for testing
+        if counter == 2:
             break
-
+        counter += 1
+        '''
 
     # sortCandidatesByCount(masks) // highest count first
     sorted_mask_count = sorted(mask_count.items(), key=lambda item: item[1], reverse=True)
@@ -229,9 +231,3 @@ def make_mask(dist_transform, cell_area):
     plt.show()
     '''
     return mask
-
-'''
-dist_transform = np.load("C:/Users/Tobias/Desktop/test2/test2/distance_transform/11657-28091999_01_x1=1223_y1=3855_x2=2247_y2=4879_dt.npy")
-dist_transform2 = np.load("D:/Datasets/Testis_Model/Cellpose/Train/distance_transform/0108_dt.npy")
-dist_transform3 = np.load("D:/Datasets/Testis_Model/Cellpose/Train/distance_transform/0340_dt.npy")
-'''
