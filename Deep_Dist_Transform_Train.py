@@ -137,7 +137,7 @@ def DDT_predict(train_image_folder, test_path, test_path_2, fold_n):
         metrics = np.array([average_iou, precision, n_true_p, n_false_p, n_false_n])
         
         np.save(f"{train_image_folder}/metrics_Cellpose.npy", metrics)
-        print("Cellpose Test fertig")
+        print("metrics_Cellpose.npy ist fertig")
         print("-----------------------------------")
 
         ##### Test Testis #####
@@ -168,9 +168,10 @@ def DDT_predict(train_image_folder, test_path, test_path_2, fold_n):
         metrics_2 = np.array([average_iou, precision, n_true_p, n_false_p, n_false_n])
         
         np.save(f"{train_image_folder}/metrics_Testis.npy", metrics_2)
+        print("metrics_Testis.npy ist fertig")
     else:
         ##### Test Fold #####
-        print(f"Fold {fold_n} Test hat begonnen")
+        print(f"{fold_n} Test hat begonnen")
         test_dataset = ImageDataset(
             image_folder=f"{test_path}/img",
             dt_folder=f"{test_path}/dt",
@@ -194,10 +195,11 @@ def DDT_predict(train_image_folder, test_path, test_path_2, fold_n):
 
 
         metrics = np.array([average_iou, precision, n_true_p, n_false_p, n_false_n])
+        print(metrics)
         
-        np.save(f"{train_image_folder}/metrics_Fold_{fold_n}.npy", metrics)
-        print(f"Fold {fold_n} Test fertig")
-        print("-----------------------------------")
+        np.save(f"{train_image_folder}/metrics_{fold_n}.npy", metrics)
+        print(f"metrics_{fold_n}.npy ist fertig")
+    print("-------------Ende---------------")
 
 ####################
 # DDT_Train(): Train Deep Distance Transform model and save best model
@@ -220,7 +222,7 @@ def DDT_train(train_path, test_path, test_path_2, fold_n):
     # model, loss function and Adam optimizer with parameters from paper
     model = UNet(in_channels=3, out_channels=1)
     loss_fn = WeightedEuclideanLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, betas=(0.9, 0.999), eps=1e-8, weight_decay=2e-4)
+    optimizer = torch.optim.Adam(model.parameters(), betas=(0.1, 0.999), eps=1e-8, weight_decay=2e-4)
 
     # training
     num_epochs = 10
@@ -252,9 +254,26 @@ def DDT_train(train_path, test_path, test_path_2, fold_n):
     print("Tests beginnen")
     DDT_predict(train_image_folder, test_path, test_path_2, fold_n)
 
-
+# local function call with small dataset for testing
+#DDT_train("C:/Users/Tobias/Desktop/U-Net_Test/train", "C:/Users/Tobias/Desktop/U-Net_Test/test", "", "Test")
+#DDT_predict("D:/Bachelorarbeit/Ergebnisse/DDT_Model", "C:/Users/Tobias/Desktop/U-Net_Test/test", "", "Test")
 ##### Function Calls #####
 # Palma Path
-palma_path = "/scratch/tmp/tkrumrei/Testis_Model"
+palma_path = "/scratch/tmp/tkrumrei/DDT_Model"
+'''
+# Cellpose
 DDT_train(f"{palma_path}/Cellpose/Train", f"{palma_path}/Test_Cellpose", f"{palma_path}/Test_Testis", "")
-#DDT_train("D:/Datasets/Testis_Model/Cellpose/Train", "D:/Datasets/Testis_Model/Cellpose/Test_Cellpose", "D:/Datasets/Testis_Model/Cellpose/Test_Testis")
+#DDT_predict(f"{palma_path}/Cellpose/Train/img", f"{palma_path}/Test_Testis", "", "")
+# Testis
+DDT_train(f"{palma_path}/Testis/Fold_1/Train", f"{palma_path}/Testis/Fold_1/Validate", "", "Fold 1")
+DDT_train(f"{palma_path}/Testis/Fold_2/Train", f"{palma_path}/Testis/Fold_2/Validate", "", "Fold 2")
+DDT_train(f"{palma_path}/Testis/Fold_3/Train", f"{palma_path}/Testis/Fold_3/Validate", "", "Fold 3")
+DDT_train(f"{palma_path}/Testis/Fold_4/Train", f"{palma_path}/Testis/Fold_4/Validate", "", "Fold 4")
+DDT_train(f"{palma_path}/Testis/Fold_5/Train", f"{palma_path}/Testis/Fold_5/Validate", "", "Fold 5")
+# Mix
+DDT_train(f"{palma_path}/Mix/Fold_1/Train", f"{palma_path}/Mix/Fold_1/Validate", "", "Fold 1")
+DDT_train(f"{palma_path}/Mix/Fold_2/Train", f"{palma_path}/Mix/Fold_2/Validate", "", "Fold 2")
+DDT_train(f"{palma_path}/Mix/Fold_3/Train", f"{palma_path}/Mix/Fold_3/Validate", "", "Fold 3")
+DDT_train(f"{palma_path}/Mix/Fold_4/Train", f"{palma_path}/Mix/Fold_4/Validate", "", "Fold 4")
+DDT_train(f"{palma_path}/Mix/Fold_5/Train", f"{palma_path}/Mix/Fold_5/Validate", "", "Fold 5")
+'''
