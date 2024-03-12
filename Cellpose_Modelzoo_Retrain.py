@@ -1,6 +1,4 @@
 # imports
-import subprocess
-import os, shutil
 import numpy as np
 import matplotlib.pyplot as plt
 from my_cellpose import core, io, models, metrics
@@ -39,7 +37,8 @@ def cellpose_eval(model_path, test_path, test_path_2, diam_labels, model_name, m
         # run model on test images
         masks = model.eval(test_data, 
                         channels=[0, None],
-                        diameter=diam_labels)[0]
+                        #diameter=diam_labels
+                        )[0]
 
 
         average_iou, precision, n_true_p, n_false_p, n_false_n = calculate_metrics(test_labels, masks)
@@ -89,6 +88,7 @@ def cellpose_eval(model_path, test_path, test_path_2, diam_labels, model_name, m
         metrics = np.array([average_iou, precision, n_true_p, n_false_p, n_false_n])
         
         np.save(metrics_path, metrics)
+        print(metrics_path)
         print(f"Test von {type_of_dataset} ist fertig")
 
 ######################
@@ -122,21 +122,24 @@ def cellpose_train(train_path, test_path, test_path_2, model_type, model_name, t
 ######################
 # Function calls
 palma_path = "/scratch/tmp/tkrumrei/Cellpose_Model"
-
+'''
 ##### Train on Datasets
 # Cellpose Dataset
-# cellpose_train("D:/Datasets/Cellpose_Model/Cellpose/Train/", "D:/Datasets/Cellpose_Model/Cellpose/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Cellpose/Test_Testis/", None, "Cellpose_Model")
+cellpose_train("D:/Datasets/Cellpose_Model/Cellpose/Train/", "D:/Datasets/Cellpose_Model/Cellpose/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Cellpose/Test_Testis/", None, "Cellpose_Model")
 # Testis Dataset
 cellpose_train(f"{palma_path}/Testis/Fold_1/Train/", f"{palma_path}/Testis/Fold_1/Validate/", "", "cyto", "Cyto_Testis_Fold_1_Model", "Fold_1")
-#cellpose_train(f"{palma_path}/Testis/Fold_2/Train/", f"{palma_path}/Testis/Fold_1/Validate/", "", "cyto", "Cyto_Testis_Fold_2_Model", "Fold_2")
-#cellpose_train(f"{palma_path}/Testis/Fold_3/Train/", f"{palma_path}/Testis/Fold_1/Validate/", "", "cyto", "Cyto_Testis_Fold_3_Model", "Fold_3")
-#cellpose_train(f"{palma_path}/Testis/Fold_4/Train/", f"{palma_path}/Testis/Fold_1/Validate/", "", "cyto", "Cyto_Testis_Fold_4_Model", "Fold_4")
-#cellpose_train(f"{palma_path}/Testis/Fold_5/Train/", f"{palma_path}/Testis/Fold_1/Validate/", "", "cyto", "Cyto_Testis_Fold_5_Model", "Fold_5")
+cellpose_train(f"{palma_path}/Testis/Fold_2/Train/", f"{palma_path}/Testis/Fold_2/Validate/", "", "cyto", "Cyto_Testis_Fold_2_Model", "Fold_2")
+cellpose_train(f"{palma_path}/Testis/Fold_3/Train/", f"{palma_path}/Testis/Fold_3/Validate/", "", "cyto", "Cyto_Testis_Fold_3_Model", "Fold_3")
+cellpose_train(f"{palma_path}/Testis/Fold_4/Train/", f"{palma_path}/Testis/Fold_4/Validate/", "", "cyto", "Cyto_Testis_Fold_4_Model", "Fold_4")
+cellpose_train(f"{palma_path}/Testis/Fold_5/Train/", f"{palma_path}/Testis/Fold_5/Validate/", "", "cyto", "Cyto_Testis_Fold_5_Model", "Fold_5")
 # Best Model
-#cellpose_train(f"{palma_path}/Testis/Fold_X/", f"{palma_path}/Test_Cellpose/", f"{palma_path}/Test_Testis/", "cyto", "Cyto_Testis_Fold_X_Model")
+#cellpose_eval(f"{palma_path}/Testis/Fold_5/Train/", f"{palma_path}/Test_Cellpose/", f"{palma_path}/Test_Testis/", "", "Cyto_Testis_Fold_5_Model", "cyto", "")
 # Mix Dataset
-#cellpose_train("D:/Datasets/Cellpose_Model/Mix/Fold_1/", "D:/Datasets/Cellpose_Model/Mix/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_1_Model")
-#cellpose_train("D:/Datasets/Cellpose_Model/Mix/Fold_2/", "D:/Datasets/Cellpose_Model/Mix/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_2_Model")
-#cellpose_train("D:/Datasets/Cellpose_Model/Mix/Fold_3/", "D:/Datasets/Cellpose_Model/Mix/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_3_Model")
-#cellpose_train("D:/Datasets/Cellpose_Model/Mix/Fold_4/", "D:/Datasets/Cellpose_Model/Mix/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_4_Model")
-#cellpose_train("D:/Datasets/Cellpose_Model/Mix/Fold_5/", "D:/Datasets/Cellpose_Model/Mix/Test_Cellpose/", "D:/Datasets/Cellpose_Model/Mix/Test_Testis/", None, "Cellpose_Mix_Fold_5_Model")
+cellpose_train(f"{palma_path}/Mix/Fold_1/Train/", f"{palma_path}/Mix/Fold_1/Validate/", "", "cyto", "Cyto_Mix_Fold_1_Model", "Fold_1")
+cellpose_train(f"{palma_path}/Mix/Fold_2/Train/", f"{palma_path}/Mix/Fold_2/Validate/", "", "cyto", "Cyto_Mix_Fold_2_Model", "Fold_2")
+cellpose_train(f"{palma_path}/Mix/Fold_3/Train/", f"{palma_path}/Mix/Fold_3/Validate/", "", "cyto", "Cyto_Mix_Fold_3_Model", "Fold_3")
+cellpose_train(f"{palma_path}/Mix/Fold_4/Train/", f"{palma_path}/Mix/Fold_4/Validate/", "", "cyto", "Cyto_Mix_Fold_4_Model", "Fold_4")
+cellpose_train(f"{palma_path}/Mix/Fold_5/Train/", f"{palma_path}/Mix/Fold_5/Validate/", "", "cyto", "Cyto_Mix_Fold_5_Model", "Fold_5")
+# Best Model
+#cellpose_eval(f"{palma_path}/Testis/Fold_5/Train/", f"{palma_path}/Test_Cellpose/", f"{palma_path}/Test_Testis/", "", "Cyto_Mix_Fold_5_Model", "cyto", "")
+'''
